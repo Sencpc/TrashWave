@@ -1,0 +1,33 @@
+{
+  "name": "trashwave",
+  "version": "1.0.0",
+  "description": "Best API for Music",
+  "keywords": [
+    "TW"
+  ],
+  "homepage": "https://github.com/Sencpc/TrashWave#readme",
+  "bugs": {
+    "url": "https://github.com/Sencpc/TrashWave/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sencpc/TrashWave.git"
+  },
+  "license": "ISC",
+  "author": "Grup Belajar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "express": "^5.1.0",
+    "mongodb": "^6.16.0",
+    "multer": "^1.4.5-lts.2",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.8.0"
+  }
+}
