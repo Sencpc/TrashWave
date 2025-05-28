@@ -2,8 +2,8 @@
 -- Tujuan: Mengurangi redundansi, tetap mendukung semua endpoint proposal,
 -- dan mendukung penambahan lagu ke playlist/album tanpa trigger
 
-CREATE DATABASE IF NOT EXISTS ws_proyek;
-USE ws_proyek;
+CREATE DATABASE IF NOT EXISTS db_trashwave;
+USE db_trashwave;
 
 -- Artists
 DROP TABLE IF EXISTS artists;
