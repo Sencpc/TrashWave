@@ -1,9 +1,18 @@
-require("dotenv").config();
-module.exports = {
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  dialect: process.env.DB_DRIVER,
-  port: process.env.DB_PORT,
-};
+const { Sequelize } = require("sequelize");
+const config = require("./env");
+
+// Create Sequelize instance
+const sequelize = new Sequelize(
+  config.database.name,
+  config.database.user,
+  config.database.password,
+  {
+    host: config.database.host,
+    port: config.database.port,
+    dialect: config.database.dialect,
+    logging: config.database.logging,
+    pool: config.database.pool,
+  }
+);
+
+module.exports = { sequelize };

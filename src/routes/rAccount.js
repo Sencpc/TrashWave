@@ -1,11 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, upload, login, logout } = require("../controller/cAccount");
+const {
+  register,
+  login,
+  logout,
+  updateProfile,
+} = require("../controller/cAccount");
+const { auth } = require("../Middleware/auth");
 
-router.post("/register", upload.single("profile_picture"), register);
+router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
-router.put("/profile", upload.single("profile_picture"), updateProfile);
+router.put("/profile", auth, updateProfile);
 
 module.exports = router;

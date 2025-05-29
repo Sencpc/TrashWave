@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       release_date: {
         type: DataTypes.DATEONLY,
       },
-      DESCRIPTION: {
+      description: {
         type: DataTypes.TEXT,
       },
       total_tracks: {

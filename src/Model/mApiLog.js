@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
       ApiLog.belongsTo(models.User, { foreignKey: "user_id" });
     }
   }
-
   ApiLog.init(
     {
       api_log_id: {
@@ -22,13 +21,35 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      createdAt: {
-        type: DataTypes.DATE,
+      endpoint: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
       },
-      updatedAt: {
-        type: DataTypes.DATE,
+      method: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
       },
-      deletedAt: {
+      ip_address: {
+        type: DataTypes.STRING(45),
+      },
+      user_agent: {
+        type: DataTypes.TEXT,
+      },
+      response_status: {
+        type: DataTypes.INTEGER,
+      },
+      response_time_ms: {
+        type: DataTypes.INTEGER,
+      },
+      created_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      deleted_at: {
         type: DataTypes.DATE,
       },
     },
@@ -38,6 +59,9 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "api_log",
       timestamps: true,
       paranoid: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
       name: {
         singular: "ApiLog",
         plural: "ApiLogs",

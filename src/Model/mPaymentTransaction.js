@@ -45,25 +45,52 @@ module.exports = (sequelize, DataTypes) => {
       payment_method: {
         type: DataTypes.STRING(50),
       },
+      payment_provider: {
+        type: DataTypes.STRING(50),
+      },
       transaction_id: {
         type: DataTypes.STRING(100),
         unique: true,
       },
-      STATUS: {
-        type: DataTypes.ENUM("pending", "completed", "failed", "cancelled"),
+      external_transaction_id: {
+        type: DataTypes.STRING(100),
+      },
+      status: {
+        type: DataTypes.ENUM(
+          "pending",
+          "processing",
+          "completed",
+          "failed",
+          "cancelled",
+          "refunded"
+        ),
         defaultValue: "pending",
       },
       payment_date: {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      processed_at: {
+        type: DataTypes.DATE,
+      },
+      expires_at: {
+        type: DataTypes.DATE,
+      },
+      failure_reason: {
+        type: DataTypes.TEXT,
+      },
+      metadata: {
+        type: DataTypes.JSON,
+      },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       deleted_at: {
         type: DataTypes.DATE,
@@ -73,8 +100,11 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "PaymentTransaction",
       tableName: "payment_transactions",
-      timestamps: false,
+      timestamps: true,
       paranoid: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
       name: {
         singular: "PaymentTransaction",
         plural: "PaymentTransactions",

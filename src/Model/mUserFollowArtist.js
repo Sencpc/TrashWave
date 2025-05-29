@@ -1,0 +1,60 @@
+"use strict";
+const { Model } = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  class UserFollowArtist extends Model {
+    static associate(models) {
+      UserFollowArtist.belongsTo(models.User, { foreignKey: "user_id" });
+      UserFollowArtist.belongsTo(models.Artist, { foreignKey: "artist_id" });
+    }
+  }
+
+  UserFollowArtist.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      artist_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "artists",
+          key: "id",
+        },
+      },
+      followed_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+    },
+    {
+      sequelize,
+      modelName: "UserFollowArtist",
+      tableName: "user_follow_artists",
+      timestamps: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ["user_id", "artist_id"],
+        },
+      ],
+      name: {
+        singular: "UserFollowArtist",
+        plural: "UserFollowArtists",
+      },
+    }
+  );
+
+  return UserFollowArtist;
+};

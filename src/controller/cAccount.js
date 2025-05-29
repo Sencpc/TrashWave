@@ -4,6 +4,7 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 const accountSchema = require("../utils/accountSchema");
 const User = require("../Model/mAccount");
 
@@ -43,23 +44,26 @@ const register = async (req, res) => {
     }
 
     // Validate input
-    const { error, value } = accountSchema.validate(req.body, { abortEarly: false });
+    const { error, value } = accountSchema.validate(req.body, {
+      abortEarly: false,
+    });
     if (error) {
-      return res.status(400).json({ errors: error.details.map(e => e.message) });
+      return res
+        .status(400)
+        .json({ errors: error.details.map((e) => e.message) });
     }
 
     try {
       // Check if username or email already exists
       const exists = await User.findOne({
         where: {
-          [User.sequelize.Op.or]: [
-            { username: value.username },
-            { email: value.email }
-          ]
-        }
+          [Op.or]: [{ username: value.username }, { email: value.email }],
+        },
       });
       if (exists) {
-        return res.status(409).json({ error: "Username or email already exists" });
+        return res
+          .status(409)
+          .json({ error: "Username or email already exists" });
       }
 
       // Hash password
@@ -158,7 +162,7 @@ const logout = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     // Check API key in header
-    const apiKey = req.headers['x-api-key'];
+    const apiKey = req.headers["x-api-key"];
     if (!apiKey) {
       return res.status(401).json({ error: "API key required" });
     }
@@ -171,12 +175,16 @@ const updateProfile = async (req, res) => {
 
     // Validate input (reuse accountSchema but make all fields optional)
     const updateSchema = accountSchema.fork(
-      ['username', 'email', 'confirm_password', 'password'],
+      ["username", "email", "confirm_password", "password"],
       (schema) => schema.optional()
     );
-    const { error, value } = updateSchema.validate(req.body, { abortEarly: false });
+    const { error, value } = updateSchema.validate(req.body, {
+      abortEarly: false,
+    });
     if (error) {
-      return res.status(400).json({ errors: error.details.map(e => e.message) });
+      return res
+        .status(400)
+        .json({ errors: error.details.map((e) => e.message) });
     }
 
     // Prepare update data
