@@ -155,4 +155,59 @@ const logout = async (req, res) => {
   return res.sendStatus(204);
 };
 
-module.exports = { register, upload, login, logout };
+const updateProfile = async (req, res) => {
+  try {
+    // Check API key in header
+    const apiKey = req.headers['x-api-key'];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    // Find user by API key
+    const user = await User.findOne({ where: { api_key: apiKey } });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    // Validate input (reuse accountSchema but make all fields optional)
+    const updateSchema = accountSchema.fork(
+      ['username', 'email', 'confirm_password', 'password'],
+      (schema) => schema.optional()
+    );
+    const { error, value } = updateSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({ errors: error.details.map(e => e.message) });
+    }
+
+    // Prepare update data
+    const updateData = {};
+    if (value.full_name) updateData.full_name = value.full_name;
+    if (value.date_of_birth) updateData.date_of_birth = value.date_of_birth;
+    if (value.country) updateData.country = value.country;
+
+    // Handle password update
+    if (value.password) {
+      updateData.password_hash = await bcrypt.hash(value.password, 10);
+    }
+
+    // Handle profile picture update
+    if (req.file) {
+      updateData.profile_picture = req.file.path.replace(/\\/g, "/");
+    }
+
+    // Update user
+    await user.update(updateData);
+
+    // Remove sensitive info
+    const userData = { ...user.toJSON() };
+    delete userData.password_hash;
+    delete userData.refresh_token;
+
+    return res.status(200).json({ message: "Profile updated", user: userData });
+  } catch (e) {
+    console.error("Update profile error:", e);
+    return res.status(500).json({ error: "Profile update failed" });
+  }
+};
+
+module.exports = { register, upload, login, logout, updateProfile };
