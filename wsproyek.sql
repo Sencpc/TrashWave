@@ -1,24 +1,7 @@
--- Final Revised SQL Schema for ws_proyek
--- Tujuan: Mengurangi redundansi, tetap mendukung semua endpoint proposal,
--- dan mendukung penambahan lagu ke playlist/album tanpa trigger
+-- Database: db_trashwave
 
 CREATE DATABASE IF NOT EXISTS db_trashwave;
 USE db_trashwave;
-
--- Artists
-DROP TABLE IF EXISTS artists;
-CREATE TABLE artists (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL UNIQUE,
-  stage_name VARCHAR(100) NOT NULL,
-  bio TEXT,
-  verified TINYINT(1) DEFAULT 0,
-  follower_count INT DEFAULT 0,
-  monthly_listeners INT DEFAULT 0,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  deleted_at DATETIME
-);
 
 -- Users
 DROP TABLE IF EXISTS users;
@@ -32,13 +15,59 @@ CREATE TABLE users (
   date_of_birth DATE,
   country VARCHAR(50),
   ROLE ENUM('admin','artist','user') DEFAULT 'user',
-  subscription_type ENUM('free','premium_lite','premium') DEFAULT 'free',
   streaming_quota INT DEFAULT 0,
   download_quota INT DEFAULT 0,
   is_active TINYINT(1) DEFAULT 1,
+  api_key TEXT,
+  refresh_token TEXT,
+  api_level ENUM('free','freemium','premium') NOT NULL DEFAULT 'free',
+  api_quota INT NOT NULL DEFAULT 0,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   deleted_at DATETIME
+);
+
+-- API Tier List
+DROP TABLE IF EXISTS api_tierlist;
+CREATE TABLE api_tierlist (
+  api_tier ENUM('free','freemium','premium') NOT NULL,
+  api_limit INT DEFAULT NULL,
+  api_quota INT DEFAULT NULL,
+  PRIMARY KEY (api_tier)
+);
+
+-- Data for API Tier List
+INSERT INTO api_tierlist (api_tier, api_limit, api_quota) VALUES 
+('free', 3, 6),
+('freemium', 5, 10),
+('premium', -1, -1);
+
+-- API Log
+DROP TABLE IF EXISTS api_log;
+CREATE TABLE api_log (
+  api_log_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id INT DEFAULT NULL,
+  createdAt DATETIME DEFAULT NULL,
+  updatedAt DATETIME DEFAULT NULL,
+  deletedAt DATETIME DEFAULT NULL,
+  PRIMARY KEY (api_log_id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Artists
+DROP TABLE IF EXISTS artists;
+CREATE TABLE artists (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL UNIQUE,
+  stage_name VARCHAR(100) NOT NULL,
+  bio TEXT,
+  verified TINYINT(1) DEFAULT 0,
+  follower_count INT DEFAULT 0,
+  monthly_listeners INT DEFAULT 0,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  deleted_at DATETIME,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Albums
@@ -113,21 +142,6 @@ CREATE TABLE playlist_songs (
   UNIQUE(playlist_id, song_id),
   FOREIGN KEY (playlist_id) REFERENCES playlists(id),
   FOREIGN KEY (song_id) REFERENCES songs(id)
-);
-
--- Song Collaborations
-DROP TABLE IF EXISTS song_collaborations;
-CREATE TABLE song_collaborations (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  song_id INT NOT NULL,
-  artist_id INT NOT NULL,
-  ROLE ENUM('featured','producer','writer','composer') DEFAULT 'featured',
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  deleted_at DATETIME,
-  UNIQUE(song_id, artist_id, ROLE),
-  FOREIGN KEY (song_id) REFERENCES songs(id),
-  FOREIGN KEY (artist_id) REFERENCES artists(id)
 );
 
 -- Subscription Plans
