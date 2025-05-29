@@ -5,7 +5,6 @@ const { register, login, refreshToken, logout } = require("../controller/cAccoun
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/refreshToken", refreshToken);
 router.get("/logout", logout);
 
 module.exports = router;
