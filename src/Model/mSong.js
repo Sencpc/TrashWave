@@ -2,60 +2,68 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Playlist extends Model {
+  class Song extends Model {
     static associate(models) {
-      Playlist.belongsTo(models.User, { foreignKey: "user_id" });
-      Playlist.hasMany(models.PlaylistSong, { foreignKey: "playlist_id" });
-      Playlist.belongsToMany(models.Song, {
+      Song.belongsTo(models.Artist, { foreignKey: "artist_id" });
+      Song.belongsTo(models.Album, { foreignKey: "album_id" });
+      Song.hasMany(models.PlaylistSong, { foreignKey: "song_id" });
+      Song.belongsToMany(models.Playlist, {
         through: models.PlaylistSong,
-        foreignKey: "playlist_id",
+        foreignKey: "song_id",
       });
     }
   }
 
-  Playlist.init(
+  Song.init(
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
+      title: {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      description: {
-        type: DataTypes.TEXT,
-      },
-      user_id: {
+      artist_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "users",
+          model: "artists",
           key: "id",
         },
       },
-      cover_image: {
+      album_id: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "albums",
+          key: "id",
+        },
+      },
+      file_url: {
         type: DataTypes.STRING(255),
+        allowNull: false,
       },
-      is_public: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+      duration_seconds: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
-      is_official: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+      lyrics: {
+        type: DataTypes.TEXT,
+      },
+      play_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       like_count: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      total_songs: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
+      release_date: {
+        type: DataTypes.DATEONLY,
       },
-      total_duration: {
-        type: DataTypes.INTEGER,
+      is_explicit: {
+        type: DataTypes.BOOLEAN,
         defaultValue: 0,
       },
       created_at: {
@@ -72,16 +80,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Playlist",
-      tableName: "playlists",
+      modelName: "Song",
+      tableName: "songs",
       timestamps: false,
       paranoid: true,
       name: {
-        singular: "Playlist",
-        plural: "Playlists",
+        singular: "Song",
+        plural: "Songs",
       },
     }
   );
 
-  return Playlist;
+  return Song;
 };

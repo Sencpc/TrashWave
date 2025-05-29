@@ -2,59 +2,46 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Playlist extends Model {
+  class Artist extends Model {
     static associate(models) {
-      Playlist.belongsTo(models.User, { foreignKey: "user_id" });
-      Playlist.hasMany(models.PlaylistSong, { foreignKey: "playlist_id" });
-      Playlist.belongsToMany(models.Song, {
-        through: models.PlaylistSong,
-        foreignKey: "playlist_id",
-      });
+      Artist.belongsTo(models.User, { foreignKey: "user_id" });
+      Artist.hasMany(models.Album, { foreignKey: "artist_id" });
+      Artist.hasMany(models.Song, { foreignKey: "artist_id" });
     }
   }
 
-  Playlist.init(
+  Artist.init(
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-      },
-      description: {
-        type: DataTypes.TEXT,
-      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        unique: true,
         references: {
           model: "users",
           key: "id",
         },
       },
-      cover_image: {
-        type: DataTypes.STRING(255),
+      stage_name: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
       },
-      is_public: {
+      bio: {
+        type: DataTypes.TEXT,
+      },
+      verified: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: 0,
       },
-      is_official: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      like_count: {
+      follower_count: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      total_songs: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      total_duration: {
+      monthly_listeners: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
@@ -72,16 +59,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Playlist",
-      tableName: "playlists",
+      modelName: "Artist",
+      tableName: "artists",
       timestamps: false,
       paranoid: true,
       name: {
-        singular: "Playlist",
-        plural: "Playlists",
+        singular: "Artist",
+        plural: "Artists",
       },
     }
   );
 
-  return Playlist;
+  return Artist;
 };
