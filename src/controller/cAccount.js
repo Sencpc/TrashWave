@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
-const accountSchema = require("../utils/accountSchema");
+const { accountSchema } = require("../validation/schemas");
 const User = require("../Model/mAccount");
 
 // Multer storage config for profile picture
