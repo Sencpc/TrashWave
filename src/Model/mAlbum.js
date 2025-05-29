@@ -2,60 +2,51 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Playlist extends Model {
+  class Album extends Model {
     static associate(models) {
-      Playlist.belongsTo(models.User, { foreignKey: "user_id" });
-      Playlist.hasMany(models.PlaylistSong, { foreignKey: "playlist_id" });
-      Playlist.belongsToMany(models.Song, {
-        through: models.PlaylistSong,
-        foreignKey: "playlist_id",
-      });
+      Album.belongsTo(models.Artist, { foreignKey: "artist_id" });
+      Album.hasMany(models.Song, { foreignKey: "album_id" });
     }
   }
 
-  Playlist.init(
+  Album.init(
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
+      title: {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      description: {
-        type: DataTypes.TEXT,
-      },
-      user_id: {
+      artist_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "users",
+          model: "artists",
           key: "id",
         },
       },
       cover_image: {
         type: DataTypes.STRING(255),
       },
-      is_public: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+      release_date: {
+        type: DataTypes.DATEONLY,
       },
-      is_official: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+      DESCRIPTION: {
+        type: DataTypes.TEXT,
       },
-      like_count: {
+      total_tracks: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      total_songs: {
+      duration_seconds: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      total_duration: {
-        type: DataTypes.INTEGER,
+      is_single: {
+        type: DataTypes.BOOLEAN,
         defaultValue: 0,
       },
       created_at: {
@@ -72,16 +63,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Playlist",
-      tableName: "playlists",
+      modelName: "Album",
+      tableName: "albums",
       timestamps: false,
       paranoid: true,
       name: {
-        singular: "Playlist",
-        plural: "Playlists",
+        singular: "Album",
+        plural: "Albums",
       },
     }
   );
 
-  return Playlist;
+  return Album;
 };
