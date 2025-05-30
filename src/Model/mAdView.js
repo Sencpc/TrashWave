@@ -79,7 +79,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "AdView",
-      tableName: "AdViews",
+      tableName: "ad_views",
       timestamps: true,
       createdAt: "created_at",
       updatedAt: false,
