@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const { accountSchema } = require("../validation/schemas");
-const User = require("../Model/mAccount");
+const { User } = require("../Model/mIndex");
 
 // Multer storage config for profile picture
 const storage = multer.diskStorage({
@@ -136,8 +136,8 @@ const login = async (req, res) => {
     delete userData.password_hash;
     delete userData.refresh_token;
 
-    // Generate JWT token (never expires)
-    const token = jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET);
+    // Generate JWT token
+    const token = jwt.sign(userData, process.env.JWT_SECRET);
 
     return res.status(200).json({
       message: "Login successful",

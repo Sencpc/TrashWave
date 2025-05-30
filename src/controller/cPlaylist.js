@@ -2,12 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Op, Sequelize } = require("sequelize");
-const Playlist = require("../Model/mPlaylist");
-const PlaylistSong = require("../Model/mPlaylistSong");
-const Song = require("../Model/mSong");
-const Artist = require("../Model/mArtist");
-const User = require("../Model/mAccount");
-const UserLikePlaylist = require("../Model/mUserLikePlaylist");
+const { Playlist, PlaylistSong, Song, Artist, User, UserLikePlaylist } = require("../Model/mIndex");
 
 // Multer storage config for playlist cover images
 const storage = multer.diskStorage({
@@ -67,7 +62,7 @@ const getAllPlaylist = async (req, res) => {
       include: [
         {
           model: User,
-          as: "user",
+          as: "User", // perbaiki alias
           attributes: ["id", "username", "profile_picture"],
         },
       ],
@@ -81,7 +76,6 @@ const getAllPlaylist = async (req, res) => {
       pagination: {
         total: playlists.count,
         page: parseInt(page),
-        limit: parseInt(limit),
         totalPages: Math.ceil(playlists.count / limit),
       },
     });
@@ -101,23 +95,23 @@ const getPlaylistById = async (req, res) => {
       include: [
         {
           model: User,
-          as: "user",
+          as: "User",
           attributes: ["id", "username", "profile_picture"],
         },
         {
           model: PlaylistSong,
-          as: "playlist_songs",
+          as: "PlaylistSongs", // perbaiki alias agar sesuai dengan relasi di model
           include: [
             {
               model: Song,
-              as: "song",
+              as: "Song", // perbaiki alias agar sesuai dengan relasi di model
               where: { deleted_at: null },
               required: false,
               include: [
                 {
                   model: Artist,
-                  as: "artist",
-                  attributes: ["id", "name", "profile_picture"],
+                  as: "Artist",
+                  attributes: ["id", "stage_name"], 
                 },
               ],
             },
@@ -147,6 +141,14 @@ const getPlaylistById = async (req, res) => {
 
 // POST /playlists - Create new playlist
 const createPlaylist = async (req, res) => {
+  // Debug log to check user object
+  // console.log("REQ.USER:", req.user);
+  // Normalisasi role agar bisa pakai field role atau ROLE
+  const userRole = req.user.role || req.user.ROLE;
+  if (!userRole || userRole !== "user") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
   upload.single("cover_image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -165,13 +167,27 @@ const createPlaylist = async (req, res) => {
         coverImagePath = req.file.path.replace(/\\/g, "/");
       }
 
+      console.log({
+        name,
+        description: description || null,
+        user_id: req.user.id,
+        cover_image: coverImagePath,
+        is_public: is_public !== undefined ? is_public === "true" : true,
+        is_official: false,
+        song_count: 0,
+        total_duration: 0,
+        like_count: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
       const playlist = await Playlist.create({
         name,
         description: description || null,
         user_id: req.user.id,
         cover_image: coverImagePath,
         is_public: is_public !== undefined ? is_public === "true" : true,
-        is_official: req.user.role === "admin" ? is_official === "true" : false,
+        is_official: false, // Only admin can set this, but only 'user' can create
         song_count: 0,
         total_duration: 0,
         like_count: 0,
@@ -183,7 +199,7 @@ const createPlaylist = async (req, res) => {
         include: [
           {
             model: User,
-            as: "user",
+            as: "User", // Sesuaikan alias dengan yang ada di model
             attributes: ["id", "username", "profile_picture"],
           },
         ],
@@ -242,7 +258,7 @@ const updatePlaylist = async (req, res) => {
         include: [
           {
             model: User,
-            as: "user",
+            as: "User",
             attributes: ["id", "username", "profile_picture"],
           },
         ],

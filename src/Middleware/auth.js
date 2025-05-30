@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "your-secret-key"
+      process.env.JWT_SECRET || "TRASHWAVE"
     );
     const user = await User.findByPk(decoded.id);
 
@@ -23,7 +23,7 @@ const auth = async (req, res, next) => {
       });
     }
 
-    req.user = user;
+    req.user = user.toJSON(); // Ensure plain object with correct field names
     next();
   } catch (error) {
     res.status(401).json({
@@ -33,7 +33,7 @@ const auth = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-  if (req.user.ROLE !== "admin") {
+  if (req.user.role !== "admin") {
     return res.status(403).json({
       error: "Access denied. Admin role required.",
     });
@@ -42,7 +42,7 @@ const admin = (req, res, next) => {
 };
 
 const artist = (req, res, next) => {
-  if (req.user.ROLE !== "artist" && req.user.ROLE !== "admin") {
+  if (req.user.role !== "artist" && req.user.role !== "admin") {
     return res.status(403).json({
       error: "Access denied. Artist role required.",
     });
@@ -53,7 +53,7 @@ const artist = (req, res, next) => {
 const checkOwnership = (req, res, next) => {
   const userId = req.params.userId || req.params.id;
 
-  if (req.user.ROLE === "admin" || req.user.id == userId) {
+  if (req.user.role === "admin" || req.user.id == userId) {
     return next();
   }
 
