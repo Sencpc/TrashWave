@@ -87,6 +87,7 @@ const register = async (req, res) => {
         profile_picture: profilePicPath,
         date_of_birth: value.date_of_birth,
         country: value.country,
+        gender: value.gender,
         ROLE: "user",
         streaming_quota: 0,
         download_quota: 0,
@@ -218,4 +219,63 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, upload, login, logout, updateProfile };
+// GET user by API key (profil sendiri)
+const getUser = async (req, res) => {
+  try {
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+    const user = await User.findOne({
+      where: { api_key: apiKey },
+      attributes: [
+        "username",
+        "full_name",
+        "date_of_birth",
+        "country",
+        "gender",
+        "profile_picture",
+      ],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to get user" });
+  }
+};
+
+// GET user by username (public)
+const getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({
+      where: { username },
+      attributes: [
+        "username",
+        "full_name",
+        "date_of_birth",
+        "country",
+        "gender",
+        "profile_picture",
+      ],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to get user" });
+  }
+};
+
+module.exports = {
+  register,
+  upload,
+  login,
+  logout,
+  updateProfile,
+  getUser,
+  getUserByUsername,
+};

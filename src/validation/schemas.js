@@ -51,6 +51,7 @@ const accountSchema = Joi.object({
     }),
 
   country: Joi.string().max(50).label("Country").allow(null, ""),
+  gender: Joi.string().valid("male", "female", "other").required().label("Gender"),
 });
 
 const registerSchema = Joi.object({
