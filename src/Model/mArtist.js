@@ -4,9 +4,9 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Artist extends Model {
     static associate(models) {
-      Artist.belongsTo(models.User, { foreignKey: "user_id" });
-      Artist.hasMany(models.Album, { foreignKey: "artist_id" });
-      Artist.hasMany(models.Song, { foreignKey: "artist_id" });
+      Artist.belongsTo(models.User, { foreignKey: "id" });
+      Artist.hasMany(models.Album, { foreignKey: "id" });
+      Artist.hasMany(models.Song, { foreignKey: "id" });
     }
   }
 
@@ -30,8 +30,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      real_name: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+      },
       bio: {
         type: DataTypes.TEXT,
+      },
+      genre:{
+        type:DataTypes.STRING(100)
+      },
+      country: {
+        type:DataTypes.STRING(100),
+        allowNull: false
       },
       verified: {
         type: DataTypes.BOOLEAN,

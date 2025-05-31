@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const Artist = require("../Model/mArtist");
+const models = require("../model/mIndex");
 const Song = require("../Model/mSong");
 const Album = require("../Model/mAlbum");
 const UserFollowArtist = require("../Model/mUserFollowArtist");
@@ -45,30 +45,35 @@ const getAllArtists = async (req, res) => {
 
     const where = { deleted_at: null };
     if (search) {
-      where[Artist.sequelize.Op.or] = [
-        { name: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
-        { bio: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
+      where[models.Artist.sequelize.Op.or] = [
+        { name: { [models.Artist.sequelize.Op.iLike]: `%${search}%` } },
+        { bio: { [models.Artist.sequelize.Op.iLike]: `%${search}%` } },
       ];
     }
     if (genre) {
-      where.genres = { [Artist.sequelize.Op.contains]: [genre] };
+      where.genres = { [models.Artist.sequelize.Op.contains]: [genre] };
     }
 
-    const artists = await Artist.findAndCountAll({
+    const artists = await models.Artist.findAndCountAll({
       where,
       attributes: [
-        "id",
-        "name",
-        "bio",
-        "profile_picture",
-        "genres",
-        "follower_count",
-        "verification_status",
-        "created_at",
+      "id",
+      "stage_name", 
+      "real_name",
+      "bio",
+      "genre",
+      "follower_count",
+      "monthly_listeners",
+      "verified",
+      "created_at"
       ],
       order: [["follower_count", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
+      include: [{
+      model: models.User,
+      attributes: ['profile_picture']
+      }]
     });
 
     return res.status(200).json({
@@ -91,12 +96,12 @@ const getArtistById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
       attributes: { exclude: ["password_hash", "api_key"] },
       include: [
         {
-          model: Song,
+          model: models.Song,
           as: "songs",
           where: { deleted_at: null },
           required: false,
@@ -104,7 +109,7 @@ const getArtistById = async (req, res) => {
           order: [["created_at", "DESC"]],
         },
         {
-          model: Album,
+          model: models.Album,
           as: "albums",
           where: { deleted_at: null },
           required: false,
