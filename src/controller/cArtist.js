@@ -4,9 +4,6 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const models = require("../model/mIndex");
-const Song = require("../Model/mSong");
-const Album = require("../Model/mAlbum");
-const UserFollowArtist = require("../Model/mUserFollowArtist");
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({
@@ -276,7 +273,7 @@ const deleteArtist = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -299,7 +296,7 @@ const toggleFollowArtist = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -307,7 +304,7 @@ const toggleFollowArtist = async (req, res) => {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-    const existingFollow = await UserFollowArtist.findOne({
+    const existingFollow = await models.UserFollowArtist.findOne({
       where: { user_id: userId, artist_id: id },
     });
 
@@ -320,7 +317,7 @@ const toggleFollowArtist = async (req, res) => {
         .json({ message: "Artist unfollowed", following: false });
     } else {
       // Follow
-      await UserFollowArtist.create({
+      await models.UserFollowArtist.create({
         user_id: userId,
         artist_id: id,
         created_at: new Date(),
@@ -343,16 +340,16 @@ const getArtistSongs = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    const artist = await Artist.findByPk(id);
+    const artist = await models.Artist.findByPk(id);
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-    const songs = await Song.findAndCountAll({
+    const songs = await models.Song.findAndCountAll({
       where: { artist_id: id, deleted_at: null },
       include: [
         {
-          model: Album,
+          model: models.Album,
           as: "album",
           attributes: ["id", "title", "cover_image"],
         },
@@ -384,12 +381,12 @@ const getArtistAlbums = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    const artist = await Artist.findByPk(id);
+    const artist = await models.Artist.findByPk(id);
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-    const albums = await Album.findAndCountAll({
+    const albums = await models.Album.findAndCountAll({
       where: { artist_id: id, deleted_at: null },
       order: [["release_date", "DESC"]],
       limit: parseInt(limit),
@@ -421,7 +418,7 @@ const verifyArtist = async (req, res) => {
       return res.status(400).json({ error: "Invalid verification status" });
     }
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -430,7 +427,7 @@ const verifyArtist = async (req, res) => {
     }
 
     await artist.update({
-      verification_status: status,
+      verified: status,
       updated_at: new Date(),
     });
 
@@ -438,8 +435,8 @@ const verifyArtist = async (req, res) => {
       message: `Artist verification status updated to ${status}`,
       artist: {
         id: artist.id,
-        name: artist.name,
-        verification_status: status,
+        name: artist.stage_name,
+        verified: status,
       },
     });
   } catch (error) {
