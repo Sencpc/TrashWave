@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const { accountSchema, subscribeSchema } = require("../validation/schemas");
-const { User } = require("../Model/mIndex");
+const { User, PaymentTransaction } = require("../Model/mIndex");
 
 // Multer storage config for profile picture
 const storage = multer.diskStorage({
@@ -271,10 +271,7 @@ const getUserByUsername = async (req, res) => {
 };
 
 const subscribeUser = async (req, res) => {
-  // Validasi input dengan Joi
-  const { error, value } = subscribeSchema.validate(req.body, {
-    abortEarly: false,
-  });
+  const { error, value } = subscribeSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res.status(400).json({ errors: error.details.map((e) => e.message) });
   }
@@ -290,12 +287,46 @@ const subscribeUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Simulasi harga dan plan (bisa diambil dari SubscriptionPlan jika ingin)
+    let amount = 0;
+    let planName = value.api_level;
+    if (value.api_level === "premium") amount = 50000;
+    else if (value.api_level === "premium_lite") amount = 25000;
+
+    // Update api_level user
     user.api_level = value.api_level;
     await user.save();
+
+    // Buat transaksi pembayaran
+    const transaction = await PaymentTransaction.create({
+      user_id: user.id,
+      subscription_plan_id: 1, // jika tidak pakai subscription_plan, bisa null
+      amount: amount,
+      currency: "IDR",
+      payment_method: "manual",
+      payment_provider: "internal",
+      transaction_id: crypto.randomUUID(),
+      status: "completed",
+      payment_date: new Date(),
+      processed_at: new Date(),
+      expires_at: null,
+      failure_reason: null,
+      metadata: {
+        api_level: value.api_level,
+      },
+    });
 
     return res.status(200).json({
       message: "Subscription updated",
       api_level: user.api_level,
+      transaction: {
+        id: transaction.id,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status,
+        payment_date: transaction.payment_date,
+        transaction_id: transaction.transaction_id,
+      },
     });
   } catch (e) {
     return res.status(500).json({ error: "Subscription failed", details: e.message });
