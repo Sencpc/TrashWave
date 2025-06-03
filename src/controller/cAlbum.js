@@ -2,7 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Album, Artist, Song, UserLikeAlbum } = require("../Model/mIndex");
-const SpotifyAPI = require("../utils/spotifyAPI");
+const SpotifyAPI = require("../utils/SpotifyAPI");
 
 // Multer storage config for album cover images
 const storage = multer.diskStorage({
