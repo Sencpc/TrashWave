@@ -8,7 +8,7 @@ const {
   UserLikeSong,
   UserDownload,
 } = require("../Model/mIndex");
-const SpotifyAPI = require("../utils/spotifyAPI");
+const SpotifyAPI = require("../utils/SpotifyAPI");
 
 // Multer storage config for song files
 const storage = multer.diskStorage({
