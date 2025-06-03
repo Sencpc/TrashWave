@@ -3,20 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-<<<<<<< HEAD
 const models = require("../model/mIndex");
 const { registerArtistSchema } = require("../validation/schemas");
 const { Op } = require("sequelize");
-=======
-const {
-  User,
-  Artist,
-  Song,
-  Album,
-  UserFollowArtist,
-} = require("../Model/mIndex");
-const SpotifyAPI = require("../utils/spotifyAPI");
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
+const SpotifyAPI = require("../utils/SpotifyAPI");
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({
@@ -67,19 +57,18 @@ const getAllArtists = async (req, res) => {
 
     const where = { deleted_at: null };
     if (search) {
-      where[Artist.sequelize.Op.or] = [
-        { name: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
-        { bio: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { bio: { [Op.iLike]: `%${search}%` } },
       ];
     }
     if (genre) {
-      where.genres = { [Artist.sequelize.Op.contains]: [genre] };
+      where.genres = { [Op.contains]: [genre] };
     }
 
-    const artists = await Artist.findAndCountAll({
+    const artists = await models.Artist.findAndCountAll({
       where,
       attributes: [
-<<<<<<< HEAD
       "id",
       "stage_name", 
       "bio",
@@ -88,17 +77,6 @@ const getAllArtists = async (req, res) => {
       "monthly_listeners",
       "verified",
       "created_at"
-=======
-        "id",
-        "stage_name",
-        "real_name",
-        "bio",
-        "genre",
-        "follower_count",
-        "monthly_listeners",
-        "verified",
-        "created_at",
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
       ],
       order: [["follower_count", "DESC"]],
       limit: parseInt(limit),
@@ -131,17 +109,12 @@ const getArtistByName = async (req, res) => {
   try {
     const { name } = req.params;
 
-<<<<<<< HEAD
     const artist = await models.Artist.findOne({
-      where: { stage_name: name, deleted_at: null },
-      attributes: { exclude: ["password_hash", "api_key"] },
-=======
-    const artist = await Artist.findOne({
       where: { id, deleted_at: null },
       attributes: { exclude: ["password_hash", "api_key"] },
       include: [
         {
-          model: Song,
+          model: models.Song,
           as: "songs",
           where: { deleted_at: null },
           required: false,
@@ -149,7 +122,7 @@ const getArtistByName = async (req, res) => {
           order: [["created_at", "DESC"]],
         },
         {
-          model: Album,
+          model: models.Album,
           as: "albums",
           where: { deleted_at: null },
           required: false,
@@ -157,7 +130,6 @@ const getArtistByName = async (req, res) => {
           order: [["created_at", "DESC"]],
         },
       ],
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (!artist) {
@@ -221,10 +193,6 @@ const registerArtist = async (req, res) => {
           .json({ error: "Username, name, email, and password are required" });
       }
 
-      if (!real_name) {
-        real_name = name.toString();
-      }
-
       // Check if email or username already exists
       const existingUser = await models.User.findOne({
         where: { [Op.or]: [{ email }, { username }] },
@@ -285,7 +253,7 @@ const registerArtist = async (req, res) => {
             username,
             email,
             password_hash: hashedPassword,
-            full_name : real_name,
+            full_name : real_name || name,
             profile_picture : profilePicPath,
             date_of_birth: dob || null,
             country: country || null,
@@ -389,7 +357,7 @@ const updateArtist = async (req, res) => {
 
       await artist.update(updateData);
 
-      const updatedArtist = await Artist.findByPk(id, {
+      const updatedArtist = await models.Artist.findByPk(id, {
         attributes: { exclude: ["password_hash", "api_key"] },
       });
 
@@ -409,7 +377,7 @@ const banArtist = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -432,26 +400,16 @@ const toggleFollowArtist = async (req, res) => {
     const { name } = req.params;
     const userId = req.user.id;
 
-<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
-=======
-    const artist = await Artist.findOne({
-      where: { id, deleted_at: null },
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-<<<<<<< HEAD
     const existingFollow = await models.UserFollowArtist.findOne({
       where: { user_id: userId, artist_id: artist.id },
-=======
-    const existingFollow = await UserFollowArtist.findOne({
-      where: { user_id: userId, artist_id: id },
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (existingFollow) {
@@ -463,7 +421,7 @@ const toggleFollowArtist = async (req, res) => {
         .json({ message: "Artist unfollowed", following: false });
     } else {
       // Follow
-      await UserFollowArtist.create({
+      await models.UserFollowArtist.create({
         user_id: userId,
         artist_id: artist.id,
         created_at: new Date(),
@@ -486,32 +444,19 @@ const getArtistSongs = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
     });
-=======
-    const artist = await Artist.findByPk(id);
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-<<<<<<< HEAD
     const songs = await models.Song.findAndCountAll({
       where: { artist_id: artist.id, deleted_at: null },
       include: [
         {
           model: models.Album,
           as: "Album",
-=======
-    const songs = await Song.findAndCountAll({
-      where: { artist_id: id, deleted_at: null },
-      include: [
-        {
-          model: Album,
-          as: "album",
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
           attributes: ["id", "title", "cover_image"],
         },
       ],
@@ -542,24 +487,15 @@ const getArtistAlbums = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
     });
-=======
-    const artist = await Artist.findByPk(id);
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-<<<<<<< HEAD
     const albums = await models.Album.findAndCountAll({
       where: { artist_id: artist.id, deleted_at: null },
-=======
-    const albums = await Album.findAndCountAll({
-      where: { artist_id: id, deleted_at: null },
->>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
       order: [["release_date", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -590,7 +526,7 @@ const verifyArtist = async (req, res) => {
       return res.status(400).json({ error: "Invalid verification status" });
     }
 
-    const artist = await Artist.findOne({
+    const artist = await models.Artist.findOne({
       where: { id, deleted_at: null },
     });
 
