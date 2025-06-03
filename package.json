@@ -18,15 +18,23 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup": "node setup.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node test.js",
+    "db:sync": "node -e \"require('./src/db/sync').syncDatabase()\"",
+    "db:force": "node -e \"require('./src/db/sync').syncDatabase(true)\"",
+    "db:drop": "node -e \"require('./src/db/sync').dropDatabase()\""
   },
   "dependencies": {
     "@joi/date": "^2.1.1",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",

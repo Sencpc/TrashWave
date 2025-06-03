@@ -4,9 +4,15 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+<<<<<<< HEAD
 const accountSchema = require("../utils/accountSchema");
 const { User } = require("../Model/mIndex");
 const { Op } = require("sequelize");
+=======
+const { Op } = require("sequelize");
+const { accountSchema } = require("../validation/schemas");
+const { User } = require("../Model/mIndex");
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
 
 // Multer storage config for profile picture
 const storage = multer.diskStorage({
@@ -43,22 +49,85 @@ const register = async (req, res) => {
     console.log("req.body:", req.body);
     console.log("req.file:", req.file);
 
+<<<<<<< HEAD
     const { error, value } = accountSchema.validate(req.body, { abortEarly: false, allowUnknown: true });
+=======
+    // Validate input
+    const { error, value } = accountSchema.validate(req.body, {
+      abortEarly: false,
+    });
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
     if (error) {
-      return res.status(400).json({ errors: error.details.map(e => e.message) });
+      return res
+        .status(400)
+        .json({ errors: error.details.map((e) => e.message) });
     }
 
+<<<<<<< HEAD
     const exists = await User.findOne({
       where: {
         [Op.or]: [
           { username: value.username },
           { email: value.email }
         ]
+=======
+    try {
+      // Check if username or email already exists
+      const exists = await User.findOne({
+        where: {
+          [Op.or]: [{ username: value.username }, { email: value.email }],
+        },
+      });
+      if (exists) {
+        return res
+          .status(409)
+          .json({ error: "Username or email already exists" });
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
       }
     });
 
+<<<<<<< HEAD
     if (exists) {
       return res.status(409).json({ error: "Username or email already exists" });
+=======
+      // Hash password
+      const hashedPassword = await bcrypt.hash(value.password, 10);
+
+      // Prepare profile picture path
+      let profilePicPath = null;
+      if (req.file) {
+        profilePicPath = req.file.path.replace(/\\/g, "/"); // For Windows path
+      }
+
+      // Generate API key
+      const apiKey = crypto.randomUUID();
+
+      // Insert user
+      const user = await User.create({
+        username: value.username,
+        email: value.email,
+        password_hash: hashedPassword,
+        full_name: value.full_name,
+        profile_picture: profilePicPath,
+        date_of_birth: value.date_of_birth,
+        country: value.country,
+        gender: value.gender,
+        ROLE: "user",
+        streaming_quota: 0,
+        download_quota: 0,
+        is_active: true,
+        api_key: apiKey,
+        api_level: "free",
+        api_quota: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      return res.status(201).json({ message: "Registration successful", user });
+    } catch (e) {
+      console.error("Register error:", e);
+      return res.status(500).json({ error: "Registration failed" });
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
     }
 
     const hashedPassword = await bcrypt.hash(value.password, 10);
@@ -125,7 +194,12 @@ const login = async (req, res) => {
     delete userData.password_hash;
     delete userData.refresh_token;
 
+<<<<<<< HEAD
     const token = jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET);
+=======
+    // Generate JWT token
+    const token = jwt.sign(userData, process.env.JWT_SECRET);
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
 
     return res.status(200).json({
       message: "Login successful",
@@ -147,7 +221,12 @@ const logout = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
+<<<<<<< HEAD
     const apiKey = req.headers['x-api-key'];
+=======
+    // Check API key in header
+    const apiKey = req.headers["x-api-key"];
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
     if (!apiKey) {
       return res.status(401).json({ error: "API key required" });
     }
@@ -159,12 +238,16 @@ const updateProfile = async (req, res) => {
 
     // Validate input (reuse accountSchema but make all fields optional)
     const updateSchema = accountSchema.fork(
-      ['username', 'email', 'confirm_password', 'password'],
+      ["username", "email", "confirm_password", "password"],
       (schema) => schema.optional()
     );
-    const { error, value } = updateSchema.validate(req.body, { abortEarly: false });
+    const { error, value } = updateSchema.validate(req.body, {
+      abortEarly: false,
+    });
     if (error) {
-      return res.status(400).json({ errors: error.details.map(e => e.message) });
+      return res
+        .status(400)
+        .json({ errors: error.details.map((e) => e.message) });
     }
 
     const updateData = {};
@@ -193,4 +276,67 @@ const updateProfile = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 module.exports = { register, upload, login, logout, updateProfile };
+=======
+// GET user by API key (profil sendiri)
+const getUser = async (req, res) => {
+  try {
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+    const user = await User.findOne({
+      where: { api_key: apiKey },
+      attributes: [
+        "username",
+        "full_name",
+        "date_of_birth",
+        "country",
+        "gender",
+        "profile_picture",
+      ],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to get user" });
+  }
+};
+
+// GET user by username (public)
+const getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({
+      where: { username },
+      attributes: [
+        "username",
+        "full_name",
+        "date_of_birth",
+        "country",
+        "gender",
+        "profile_picture",
+      ],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to get user" });
+  }
+};
+
+module.exports = {
+  register,
+  upload,
+  login,
+  logout,
+  updateProfile,
+  getUser,
+  getUserByUsername,
+};
+>>>>>>> 7abce13f19f62a628bb46071527c06260c252e56

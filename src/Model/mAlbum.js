@@ -4,8 +4,8 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Album extends Model {
     static associate(models) {
-      Album.belongsTo(models.Artist, { foreignKey: "artist_id" });
-      Album.hasMany(models.Song, { foreignKey: "album_id" });
+      Album.belongsTo(models.Artist, { foreignKey: "id" });
+      Album.hasMany(models.Song, { foreignKey: "id" });
     }
   }
 
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       title: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(200),
         allowNull: false,
       },
       artist_id: {
@@ -34,8 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       release_date: {
         type: DataTypes.DATEONLY,
       },
-      DESCRIPTION: {
+      description: {
         type: DataTypes.TEXT,
+      },
+      genre:{
+        type:DataTypes.STRING(100)
       },
       total_tracks: {
         type: DataTypes.INTEGER,
@@ -48,6 +51,18 @@ module.exports = (sequelize, DataTypes) => {
       is_single: {
         type: DataTypes.BOOLEAN,
         defaultValue: 0,
+      },
+      is_explicit:{
+        type:DataTypes.BOOLEAN,
+        defaultValue: 0
+      },
+      play_count:{
+        type:DataTypes.INTEGER,
+        defaultValue: 0
+      },
+      like_count:{
+        type:DataTypes.INTEGER,
+        defaultValue: 0
       },
       created_at: {
         type: DataTypes.DATE,

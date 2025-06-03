@@ -1,15 +1,29 @@
 const express = require("express");
-const rPlaylist = express.Router();
-const middleware = require("../Middleware/mIndex");
+const router = express.Router();
 
 const {
-    getAllPlaylist,
-    getPlaylistById,
-    createPlaylist
+  getAllPlaylist,
+  getPlaylistById,
+  createPlaylist,
+  updatePlaylist,
+  deletePlaylist,
+  toggleLikePlaylist,
+  addSongToPlaylist,
+  removeSongFromPlaylist,
 } = require("../controller/cPlaylist");
 
-rPlaylist.get("/", getAllPlaylist);
-rPlaylist.get("/:playlistId", getPlaylistById);
-// rPlaylist.post("/", middleware.cekRoles, createPlaylist);
+const { auth, admin } = require("../Middleware/auth");
 
-module.exports = rPlaylist;
+// Public routes
+router.get("/", getAllPlaylist);
+router.get("/:id", getPlaylistById);
+
+// Authenticated routes
+router.post("/", auth, createPlaylist);
+router.put("/:id", auth, updatePlaylist);
+router.delete("/:id", auth, deletePlaylist);
+router.post("/:id/like", auth, toggleLikePlaylist);
+router.post("/:id/songs", auth, addSongToPlaylist);
+router.delete("/:id/songs/:songId", auth, removeSongFromPlaylist);
+
+module.exports = router;

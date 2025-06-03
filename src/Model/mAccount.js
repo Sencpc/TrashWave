@@ -8,6 +8,13 @@ module.exports = (sequelize, DataTypes) => {
       User.hasOne(models.Artist, { foreignKey: "user_id" });
       User.hasMany(models.Playlist, { foreignKey: "user_id" });
       User.hasMany(models.PaymentTransaction, { foreignKey: "user_id" });
+      User.hasMany(models.UserFollowArtist, { foreignKey: "user_id" });
+      User.hasMany(models.UserLikeSong, { foreignKey: "user_id" });
+      User.hasMany(models.UserLikePlaylist, { foreignKey: "user_id" });
+      User.hasMany(models.UserLikeAlbum, { foreignKey: "user_id" });
+      User.hasMany(models.UserDownload, { foreignKey: "user_id" });
+      User.hasMany(models.Ad, { foreignKey: "advertiser_id", as: "ads" });
+      User.hasMany(models.AdView, { foreignKey: "user_id" });
     }
   }
 
@@ -45,17 +52,36 @@ module.exports = (sequelize, DataTypes) => {
       country: {
         type: DataTypes.STRING(50),
       },
+      phone: {
+        type: DataTypes.STRING(20),
+      },
+      bio: {
+        type: DataTypes.TEXT,
+      },
+      gender: {
+        type: DataTypes.ENUM("male", "female", "other"),
+      },
       ROLE: {
         type: DataTypes.ENUM("admin", "artist", "user"),
         defaultValue: "user",
       },
       streaming_quota: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        defaultValue: 1000,
       },
       download_quota: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        defaultValue: 50,
+      },
+      subscription_plan_id: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "subscription_plans",
+          key: "id",
+        },
+      },
+      subscription_expires_at: {
+        type: DataTypes.DATE,
       },
       is_active: {
         type: DataTypes.BOOLEAN,
@@ -68,22 +94,31 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       api_level: {
-        type: DataTypes.ENUM("free", "freemium", "premium"),
+        type: DataTypes.ENUM("free", "premium_lite", "premium"),
         allowNull: false,
         defaultValue: "free",
       },
       api_quota: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0,
+        defaultValue: 100,
+      },
+      last_login: {
+        type: DataTypes.DATE,
+      },
+      email_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       deleted_at: {
         type: DataTypes.DATE,
@@ -93,8 +128,11 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "User",
       tableName: "users",
-      timestamps: false,
+      timestamps: true,
       paranoid: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
       name: {
         singular: "User",
         plural: "Users",
