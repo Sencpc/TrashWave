@@ -182,7 +182,7 @@ const updateProfile = async (req, res) => {
       ["username", "email", "confirm_password", "password"],
       (schema) => schema.optional()
     );
-    const { error, value } = updateSchema.validate(req.body, {
+    const { error, value = {} } = updateSchema.validate(req.body, {
       abortEarly: false,
     });
     if (error) {
