@@ -11,12 +11,18 @@ const {
   getArtistSongs,
   getArtistAlbums,
   verifyArtist,
+  searchSpotifyArtists,
+  getSpotifyArtist,
+  getSpotifyArtists,
 } = require("../controller/cArtist");
 
 const { auth, admin, artist } = require("../Middleware/auth");
 
 // Public routes
 router.get("/", getAllArtists);
+router.get("/search/spotify", searchSpotifyArtists);
+router.get("/spotify/:artistId", getSpotifyArtist);
+router.get("/spotify/artists/:artistIds", getSpotifyArtists);
 router.get("/:id", getArtistById);
 router.get("/:id/songs", getArtistSongs);
 router.get("/:id/albums", getArtistAlbums);

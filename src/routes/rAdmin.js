@@ -12,6 +12,8 @@ const {
   updateSubscriptionPlan,
   deleteSubscriptionPlan,
   toggleUserBan,
+  adminSpotifySearch,
+  getSpotifyAnalytics,
 } = require("../controller/cAdmin");
 
 const { auth, admin } = require("../Middleware/auth");
@@ -42,5 +44,9 @@ router.get("/api-logs", getApiLogs);
 router.post("/subscription-plans", createSubscriptionPlan);
 router.put("/subscription-plans/:id", updateSubscriptionPlan);
 router.delete("/subscription-plans/:id", deleteSubscriptionPlan);
+
+// Spotify integration management
+router.get("/spotify/search", adminSpotifySearch);
+router.get("/spotify/analytics", getSpotifyAnalytics);
 
 module.exports = router;

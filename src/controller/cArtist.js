@@ -10,6 +10,7 @@ const {
   Album,
   UserFollowArtist,
 } = require("../Model/mIndex");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({
@@ -455,6 +456,66 @@ const verifyArtist = async (req, res) => {
   }
 };
 
+// GET /artists/search/spotify - Search artists on Spotify
+const searchSpotifyArtists = async (req, res) => {
+  try {
+    const { query, limit = 20, offset = 0, market } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchArtists(query, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Spotify artist search error:", error);
+    return res.status(500).json({ error: "Failed to search Spotify artists" });
+  }
+};
+
+// GET /artists/spotify/:artistId - Get Spotify artist details
+const getSpotifyArtist = async (req, res) => {
+  try {
+    const { artistId } = req.params;
+
+    if (!artistId) {
+      return res.status(400).json({ error: "Artist ID is required" });
+    }
+
+    const artist = await SpotifyAPI.getArtist(artistId);
+
+    return res.status(200).json(artist);
+  } catch (error) {
+    console.error("Get Spotify artist error:", error);
+    return res.status(500).json({ error: "Failed to get artist from Spotify" });
+  }
+};
+
+// GET /artists/spotify/artists/:artistIds - Get multiple Spotify artists
+const getSpotifyArtists = async (req, res) => {
+  try {
+    const { artistIds } = req.params;
+
+    if (!artistIds) {
+      return res.status(400).json({ error: "Artist IDs are required" });
+    }
+
+    const artists = await SpotifyAPI.getArtists(artistIds);
+
+    return res.status(200).json({ artists });
+  } catch (error) {
+    console.error("Get Spotify artists error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to get artists from Spotify" });
+  }
+};
+
 module.exports = {
   getAllArtists,
   getArtistById,
@@ -465,5 +526,8 @@ module.exports = {
   getArtistSongs,
   getArtistAlbums,
   verifyArtist,
+  searchSpotifyArtists,
+  getSpotifyArtist,
+  getSpotifyArtists,
   upload,
 };

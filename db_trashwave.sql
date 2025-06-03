@@ -33,14 +33,9 @@ CREATE TABLE users (
   api_level ENUM('free','premium_lite','premium') NOT NULL DEFAULT 'free',
   api_quota INT NOT NULL DEFAULT 100,
   last_login DATETIME,
-  email_verified TINYINT(1) DEFAULT 0,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  email_verified TINYINT(1) DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_username (username),
-  INDEX idx_email (email),
-  INDEX idx_role (ROLE),
-  INDEX idx_subscription (subscription_plan_id)
+  deleted_at DATETIME DEFAULT NULL
 );
 
 -- API Tier List (API rate limiting tiers)
@@ -71,14 +66,10 @@ CREATE TABLE api_log (
   ip_address VARCHAR(45),
   user_agent TEXT,
   response_status INT,
-  response_time_ms INT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  response_time_ms INT,  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   PRIMARY KEY (api_log_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_endpoint (ENDPOINT),
-  INDEX idx_created_at (created_at),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -95,12 +86,9 @@ CREATE TABLE subscription_plans (
   download_limit INT DEFAULT 0 COMMENT 'Daily download limit',
   features JSON COMMENT 'Plan features as JSON',
   is_active TINYINT(1) DEFAULT 1,
-  trial_period_days INT DEFAULT 0,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  trial_period_days INT DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_name (NAME),
-  INDEX idx_active (is_active)
+  deleted_at DATETIME DEFAULT NULL
 );
 
 -- Insert default subscription plans
@@ -124,14 +112,9 @@ CREATE TABLE artists (
   follower_count INT DEFAULT 0,
   monthly_listeners INT DEFAULT 0,
   total_plays BIGINT DEFAULT 0,
-  spotify_id VARCHAR(100) UNIQUE,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_stage_name (stage_name),
-  INDEX idx_genre (genre),
-  INDEX idx_verified (verified),
-  INDEX idx_follower_count (follower_count),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -151,15 +134,9 @@ CREATE TABLE albums (
   is_explicit TINYINT(1) DEFAULT 0,
   play_count BIGINT DEFAULT 0,
   like_count INT DEFAULT 0,
-  spotify_id VARCHAR(100) UNIQUE,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_title (title),
-  INDEX idx_artist_id (artist_id),
-  INDEX idx_genre (genre),
-  INDEX idx_release_date (release_date),
-  INDEX idx_play_count (play_count),
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
 );
 
@@ -183,16 +160,9 @@ CREATE TABLE songs (
   explicit_content TINYINT(1) DEFAULT 0,
   file_size BIGINT DEFAULT 0 COMMENT 'File size in bytes',
   bitrate INT DEFAULT 320 COMMENT 'Audio bitrate',
-  spotify_id VARCHAR(100) UNIQUE,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_title (title),
-  INDEX idx_artist_id (artist_id),
-  INDEX idx_album_id (album_id),
-  INDEX idx_genre (genre),
-  INDEX idx_play_count (play_count),
-  INDEX idx_release_date (release_date),
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE,
   FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE SET NULL
 );
@@ -209,14 +179,9 @@ CREATE TABLE playlists (
   is_official TINYINT(1) DEFAULT 0,
   like_count INT DEFAULT 0,
   total_songs INT DEFAULT 0,
-  total_duration INT DEFAULT 0,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total_duration INT DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_name (NAME),
-  INDEX idx_user_id (user_id),
-  INDEX idx_public (is_public),
-  INDEX idx_official (is_official),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -229,12 +194,8 @@ CREATE TABLE playlist_songs (
   POSITION INT NOT NULL,
   added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_playlist_song (playlist_id, song_id),
-  INDEX idx_playlist_id (playlist_id),
-  INDEX idx_song_id (song_id),
-  INDEX idx_position (POSITION),
   FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
 );
@@ -260,13 +221,8 @@ CREATE TABLE ads (
   total_spent DECIMAL(10,2) DEFAULT 0.00,
   is_active TINYINT(1) DEFAULT 1,
   start_date DATETIME,
-  end_date DATETIME,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  end_date DATETIME,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_advertiser_id (advertiser_id),
-  INDEX idx_ad_type (ad_type),
-  INDEX idx_active (is_active),
-  INDEX idx_dates (start_date, end_date),
   FOREIGN KEY (advertiser_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -282,12 +238,7 @@ CREATE TABLE ad_views (
   user_agent TEXT,
   referrer VARCHAR(500),
   device_info JSON COMMENT 'Device information as JSON',
-  location_data JSON COMMENT 'Location data as JSON',
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_ad_id (ad_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_view_type (view_type),
-  INDEX idx_created_at (created_at),
+  location_data JSON COMMENT 'Location data as JSON',  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ad_id) REFERENCES ads(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -309,15 +260,9 @@ CREATE TABLE payment_transactions (
   processed_at DATETIME,
   expires_at DATETIME,
   failure_reason TEXT,
-  metadata JSON COMMENT 'Additional payment metadata',
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  metadata JSON COMMENT 'Additional payment metadata',  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_user_id (user_id),
-  INDEX idx_subscription_plan_id (subscription_plan_id),
-  INDEX idx_status (STATUS),
-  INDEX idx_payment_date (payment_date),
-  INDEX idx_transaction_id (transaction_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans(id) ON DELETE RESTRICT
 );
@@ -329,11 +274,8 @@ CREATE TABLE user_follow_artists (
   user_id INT NOT NULL,
   artist_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_artist (user_id, artist_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_artist_id (artist_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
 );
@@ -345,11 +287,8 @@ CREATE TABLE user_like_songs (
   user_id INT NOT NULL,
   song_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_song (user_id, song_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_song_id (song_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
 );
@@ -361,11 +300,8 @@ CREATE TABLE user_like_playlists (
   user_id INT NOT NULL,
   playlist_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_playlist (user_id, playlist_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_playlist_id (playlist_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
 );
@@ -377,11 +313,8 @@ CREATE TABLE user_like_albums (
   user_id INT NOT NULL,
   album_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_album (user_id, album_id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_album_id (album_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
 );
@@ -394,13 +327,9 @@ CREATE TABLE user_downloads (
   song_id INT NOT NULL,
   download_quality ENUM('standard', 'high', 'lossless') DEFAULT 'standard',
   file_size BIGINT DEFAULT 0,
-  download_completed TINYINT(1) DEFAULT 0,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  download_completed TINYINT(1) DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
-  INDEX idx_user_id (user_id),
-  INDEX idx_song_id (song_id),
-  INDEX idx_created_at (created_at),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
 );
@@ -412,18 +341,6 @@ FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans(id) ON DELETE S
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
-
--- Create some basic indexes for performance
-CREATE INDEX idx_songs_search ON songs(title, artist_id);
-CREATE INDEX idx_albums_search ON albums(title, artist_id);
-CREATE INDEX idx_artists_search ON artists(stage_name, real_name);
-CREATE INDEX idx_playlists_search ON playlists(NAME, user_id);
-
--- Create full-text search indexes (optional, for better search performance)
--- ALTER TABLE songs ADD FULLTEXT(title, lyrics);
--- ALTER TABLE albums ADD FULLTEXT(title, description);
--- ALTER TABLE artists ADD FULLTEXT(stage_name, real_name, bio);
--- ALTER TABLE playlists ADD FULLTEXT(name, description);
 
 -- Insert Users
 INSERT INTO users (username, email, password_hash, full_name, profile_picture, date_of_birth, country, phone, bio, gender, ROLE, streaming_quota, download_quota, subscription_plan_id, subscription_expires_at, is_active, api_level, api_quota, last_login, email_verified, created_at) VALUES

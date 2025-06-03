@@ -11,6 +11,8 @@ const {
   playSong,
   downloadSong,
   searchSpotify,
+  getSpotifyTrack,
+  getSpotifyTracks,
 } = require("../controller/cSong");
 
 const { auth, admin, artist } = require("../Middleware/auth");
@@ -18,6 +20,8 @@ const { auth, admin, artist } = require("../Middleware/auth");
 // Public routes
 router.get("/", getAllSongs);
 router.get("/search/spotify", searchSpotify);
+router.get("/spotify/:trackId", getSpotifyTrack);
+router.get("/spotify/tracks/:trackIds", getSpotifyTracks);
 router.get("/:id", getSongById);
 
 // Authenticated routes

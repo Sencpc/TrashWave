@@ -10,12 +10,18 @@ const {
   toggleLikePlaylist,
   addSongToPlaylist,
   removeSongFromPlaylist,
+  searchSpotifyPlaylists,
+  getSpotifyPlaylist,
+  searchSpotifyMultiple,
 } = require("../controller/cPlaylist");
 
 const { auth, admin } = require("../Middleware/auth");
 
 // Public routes
 router.get("/", getAllPlaylist);
+router.get("/search/spotify", searchSpotifyPlaylists);
+router.get("/search/spotify/multiple", searchSpotifyMultiple);
+router.get("/spotify/:playlistId", getSpotifyPlaylist);
 router.get("/:id", getPlaylistById);
 
 // Authenticated routes

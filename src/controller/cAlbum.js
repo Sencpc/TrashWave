@@ -2,6 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Album, Artist, Song, UserLikeAlbum } = require("../Model/mIndex");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for album cover images
 const storage = multer.diskStorage({
@@ -450,6 +451,66 @@ const updateAlbumStats = async (albumId) => {
   }
 };
 
+// GET /albums/search/spotify - Search albums on Spotify
+const searchSpotifyAlbums = async (req, res) => {
+  try {
+    const { query, limit = 20, offset = 0, market } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchAlbums(query, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Spotify album search error:", error);
+    return res.status(500).json({ error: "Failed to search Spotify albums" });
+  }
+};
+
+// GET /albums/spotify/:albumId - Get Spotify album details
+const getSpotifyAlbum = async (req, res) => {
+  try {
+    const { albumId } = req.params;
+    const { market } = req.query;
+
+    if (!albumId) {
+      return res.status(400).json({ error: "Album ID is required" });
+    }
+
+    const album = await SpotifyAPI.getAlbum(albumId, market);
+
+    return res.status(200).json(album);
+  } catch (error) {
+    console.error("Get Spotify album error:", error);
+    return res.status(500).json({ error: "Failed to get album from Spotify" });
+  }
+};
+
+// GET /albums/spotify/albums/:albumIds - Get multiple Spotify albums
+const getSpotifyAlbums = async (req, res) => {
+  try {
+    const { albumIds } = req.params;
+    const { market } = req.query;
+
+    if (!albumIds) {
+      return res.status(400).json({ error: "Album IDs are required" });
+    }
+
+    const albums = await SpotifyAPI.getAlbums(albumIds, market);
+
+    return res.status(200).json({ albums });
+  } catch (error) {
+    console.error("Get Spotify albums error:", error);
+    return res.status(500).json({ error: "Failed to get albums from Spotify" });
+  }
+};
+
 module.exports = {
   getAllAlbums,
   getAlbumById,
@@ -460,5 +521,8 @@ module.exports = {
   getAlbumSongs,
   addSongToAlbum,
   removeSongFromAlbum,
+  searchSpotifyAlbums,
+  getSpotifyAlbum,
+  getSpotifyAlbums,
   upload,
 };

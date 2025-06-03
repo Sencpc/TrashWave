@@ -21,9 +21,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(50),
         allowNull: false,
         unique: true,
+        field: "NAME", // Map to existing SQL column NAME
       },
       description: {
         type: DataTypes.TEXT,
+        field: "DESCRIPTION", // Map to existing SQL column
       },
       price: {
         type: DataTypes.DECIMAL(10, 2),
