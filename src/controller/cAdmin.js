@@ -1,11 +1,13 @@
-const User = require("../Model/mAccount");
-const Artist = require("../Model/mArtist");
-const Song = require("../Model/mSong");
-const Album = require("../Model/mAlbum");
-const Playlist = require("../Model/mPlaylist");
-const SubscriptionPlan = require("../Model/mSubscriptionPlan");
-const PaymentTransaction = require("../Model/mPaymentTransaction");
-const ApiLog = require("../Model/mApiLog");
+const {
+  User,
+  Artist,
+  Song,
+  Album,
+  Playlist,
+  SubscriptionPlan,
+  PaymentTransaction,
+  ApiLog,
+} = require("../Model/mIndex");
 const { Op } = require("sequelize");
 
 // GET /admin/dashboard - Get admin dashboard statistics

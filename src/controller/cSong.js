@@ -1,11 +1,13 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Song = require("../Model/mSong");
-const Artist = require("../Model/mArtist");
-const Album = require("../Model/mAlbum");
-const UserLikeSong = require("../Model/mUserLikeSong");
-const UserDownload = require("../Model/mUserDownload");
+const {
+  Song,
+  Artist,
+  Album,
+  UserLikeSong,
+  UserDownload,
+} = require("../Model/mIndex");
 const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for song files

@@ -1,10 +1,7 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Album = require("../Model/mAlbum");
-const Artist = require("../Model/mArtist");
-const Song = require("../Model/mSong");
-const UserLikeAlbum = require("../Model/mUserLikeAlbum");
+const { Album, Artist, Song, UserLikeAlbum } = require("../Model/mIndex");
 
 // Multer storage config for album cover images
 const storage = multer.diskStorage({

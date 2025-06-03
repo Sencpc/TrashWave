@@ -1,9 +1,7 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Ad = require("../Model/mAd");
-const AdView = require("../Model/mAdView");
-const User = require("../Model/mAccount");
+const { Ad, AdView, User } = require("../Model/mIndex");
 const { Op } = require("sequelize");
 
 // Multer storage config for ad media files

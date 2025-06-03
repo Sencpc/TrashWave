@@ -1,16 +1,18 @@
 const { Op } = require("sequelize");
-const User = require("../Model/mAccount");
-const UserFollowArtist = require("../Model/mUserFollowArtist");
-const UserLikeSong = require("../Model/mUserLikeSong");
-const UserLikePlaylist = require("../Model/mUserLikePlaylist");
-const UserLikeAlbum = require("../Model/mUserLikeAlbum");
-const UserDownload = require("../Model/mUserDownload");
-const Playlist = require("../Model/mPlaylist");
-const Artist = require("../Model/mArtist");
-const Song = require("../Model/mSong");
-const Album = require("../Model/mAlbum");
-const SubscriptionPlan = require("../Model/mSubscriptionPlan");
-const PaymentTransaction = require("../Model/mPaymentTransaction");
+const {
+  User,
+  UserFollowArtist,
+  UserLikeSong,
+  UserLikePlaylist,
+  UserLikeAlbum,
+  UserDownload,
+  Playlist,
+  Artist,
+  Song,
+  Album,
+  SubscriptionPlan,
+  PaymentTransaction,
+} = require("../Model/mIndex");
 
 // GET /users - Get all users (Admin only)
 const getAllUsers = async (req, res) => {
