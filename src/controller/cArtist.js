@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const models = require("../model/mIndex");
+const models = require("../Model/mIndex");
 const { registerArtistSchema } = require("../validation/schemas");
 const { Op } = require("sequelize");
 const SpotifyAPI = require("../utils/SpotifyAPI");
@@ -83,7 +83,7 @@ const getAllArtists = async (req, res) => {
       offset: parseInt(offset),
       include: [
         {
-          model: User,
+          model: models.User,
           attributes: ["profile_picture"],
         },
       ],
@@ -110,12 +110,12 @@ const getArtistByName = async (req, res) => {
     const { name } = req.params;
 
     const artist = await models.Artist.findOne({
-      where: { id, deleted_at: null },
+      where: { stage_name: name, deleted_at: null },
       attributes: { exclude: ["password_hash", "api_key"] },
       include: [
         {
           model: models.Song,
-          as: "songs",
+          as: "Songs",
           where: { deleted_at: null },
           required: false,
           limit: 10,
@@ -123,7 +123,7 @@ const getArtistByName = async (req, res) => {
         },
         {
           model: models.Album,
-          as: "albums",
+          as: "Albums",
           where: { deleted_at: null },
           required: false,
           limit: 10,
