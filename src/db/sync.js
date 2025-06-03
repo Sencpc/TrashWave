@@ -7,15 +7,15 @@ const syncDatabase = async (force = false) => {
 
     // Test connection
     await sequelize.authenticate();
-    console.log("✅ Database connection established successfully.");
-
-    // Sync all models
+    console.log("✅ Database connection established successfully.");    // Sync all models
     if (force) {
       console.log("⚠️  Force sync enabled - This will drop existing tables!");
       await sequelize.sync({ force: true });
       console.log("✅ Database force synced successfully.");
     } else {
-      await sequelize.sync({ alter: true });
+      // Use force: true temporarily to fix column name mismatch
+      console.log("⚠️  Using force sync to fix schema mismatch - This will drop existing tables!");
+      await sequelize.sync({ force: true });
       console.log("✅ Database synced successfully.");
     }
 

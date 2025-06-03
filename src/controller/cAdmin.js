@@ -1,12 +1,15 @@
-const User = require("../Model/mAccount");
-const Artist = require("../Model/mArtist");
-const Song = require("../Model/mSong");
-const Album = require("../Model/mAlbum");
-const Playlist = require("../Model/mPlaylist");
-const SubscriptionPlan = require("../Model/mSubscriptionPlan");
-const PaymentTransaction = require("../Model/mPaymentTransaction");
-const ApiLog = require("../Model/mApiLog");
+const {
+  User,
+  Artist,
+  Song,
+  Album,
+  Playlist,
+  SubscriptionPlan,
+  PaymentTransaction,
+  ApiLog,
+} = require("../Model/mIndex");
 const { Op } = require("sequelize");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // GET /admin/dashboard - Get admin dashboard statistics
 const getDashboardStats = async (req, res) => {
@@ -526,6 +529,50 @@ const toggleUserBan = async (req, res) => {
   }
 };
 
+// GET /admin/spotify/search - Admin Spotify search for content management
+const adminSpotifySearch = async (req, res) => {
+  try {
+    const {
+      query,
+      types = "track,album,artist",
+      limit = 50,
+      market,
+    } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchMultiple(query, types, {
+      limit: parseInt(limit),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Admin Spotify search error:", error);
+    return res.status(500).json({ error: "Failed to search Spotify" });
+  }
+};
+
+// GET /admin/spotify/analytics - Get Spotify content analytics
+const getSpotifyAnalytics = async (req, res) => {
+  try {
+    // This could be extended to provide analytics on Spotify integration usage
+    const analytics = {
+      spotify_searches_today: 0, // This would need to be tracked in the database
+      most_searched_content: "tracks",
+      integration_status: "active",
+      last_api_call: new Date(),
+    };
+
+    return res.status(200).json(analytics);
+  } catch (error) {
+    console.error("Get Spotify analytics error:", error);
+    return res.status(500).json({ error: "Failed to get Spotify analytics" });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getUsers,
@@ -537,4 +584,6 @@ module.exports = {
   updateSubscriptionPlan,
   deleteSubscriptionPlan,
   toggleUserBan,
+  adminSpotifySearch,
+  getSpotifyAnalytics,
 };

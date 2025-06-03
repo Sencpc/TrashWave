@@ -2,7 +2,15 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Op, Sequelize } = require("sequelize");
-const { Playlist, PlaylistSong, Song, Artist, User, UserLikePlaylist } = require("../Model/mIndex");
+const {
+  Playlist,
+  PlaylistSong,
+  Song,
+  Artist,
+  User,
+  UserLikePlaylist,
+} = require("../Model/mIndex");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for playlist cover images
 const storage = multer.diskStorage({
@@ -111,7 +119,7 @@ const getPlaylistById = async (req, res) => {
                 {
                   model: Artist,
                   as: "Artist",
-                  attributes: ["id", "stage_name"], 
+                  attributes: ["id", "stage_name"],
                 },
               ],
             },
@@ -514,6 +522,84 @@ const updatePlaylistStats = async (playlistId) => {
   }
 };
 
+// GET /playlists/search/spotify - Search playlists on Spotify
+const searchSpotifyPlaylists = async (req, res) => {
+  try {
+    const { query, limit = 20, offset = 0, market } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchPlaylists(query, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Spotify playlist search error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to search Spotify playlists" });
+  }
+};
+
+// GET /playlists/spotify/:playlistId - Get Spotify playlist details
+const getSpotifyPlaylist = async (req, res) => {
+  try {
+    const { playlistId } = req.params;
+    const { market, fields, additional_types } = req.query;
+
+    if (!playlistId) {
+      return res.status(400).json({ error: "Playlist ID is required" });
+    }
+
+    const options = {};
+    if (market) options.market = market;
+    if (fields) options.fields = fields;
+    if (additional_types) options.additional_types = additional_types;
+
+    const playlist = await SpotifyAPI.getPlaylist(playlistId, options);
+
+    return res.status(200).json(playlist);
+  } catch (error) {
+    console.error("Get Spotify playlist error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to get playlist from Spotify" });
+  }
+};
+
+// GET /playlists/spotify/search/multiple - Search multiple content types on Spotify
+const searchSpotifyMultiple = async (req, res) => {
+  try {
+    const {
+      query,
+      types = "track,album,artist,playlist",
+      limit = 20,
+      offset = 0,
+      market,
+    } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchMultiple(query, types, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Spotify multiple search error:", error);
+    return res.status(500).json({ error: "Failed to search Spotify" });
+  }
+};
+
 module.exports = {
   getAllPlaylist,
   getPlaylistById,
@@ -524,5 +610,8 @@ module.exports = {
   addSongToPlaylist,
   removeSongFromPlaylist,
   reorderPlaylistSongs,
+  searchSpotifyPlaylists,
+  getSpotifyPlaylist,
+  searchSpotifyMultiple,
   upload,
 };

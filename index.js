@@ -34,6 +34,7 @@ const rUser = require("./src/routes/rUser");
 const rAdmin = require("./src/routes/rAdmin");
 const rSubscription = require("./src/routes/rSubscription");
 const rAd = require("./src/routes/rAd");
+const rSpotify = require("./src/routes/rSpotify");
 const { getAPIDocumentation } = require("./src/controller/cDocs");
 
 // Register API endpoints
@@ -46,6 +47,7 @@ app.use("/api/v1/users", rUser);
 app.use("/api/v1/admin", rAdmin);
 app.use("/api/v1/subscriptions", rSubscription);
 app.use("/api/v1/ads", rAd);
+app.use("/api/v1/spotify", rSpotify);
 
 // API Documentation
 app.get("/api/v1/docs", getAPIDocumentation);

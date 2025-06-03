@@ -1,11 +1,13 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Song = require("../Model/mSong");
-const Artist = require("../Model/mArtist");
-const Album = require("../Model/mAlbum");
-const UserLikeSong = require("../Model/mUserLikeSong");
-const UserDownload = require("../Model/mUserDownload");
+const {
+  Song,
+  Artist,
+  Album,
+  UserLikeSong,
+  UserDownload,
+} = require("../Model/mIndex");
 const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for song files
@@ -427,19 +429,60 @@ const downloadSong = async (req, res) => {
 // GET /songs/search/spotify - Search songs on Spotify
 const searchSpotify = async (req, res) => {
   try {
-    const { query, limit = 20 } = req.query;
+    const { query, limit = 20, offset = 0, market } = req.query;
 
     if (!query) {
       return res.status(400).json({ error: "Search query is required" });
     }
 
-    const spotify = new SpotifyAPI();
-    const results = await spotify.searchTracks(query, limit);
+    const results = await SpotifyAPI.searchTracks(query, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
 
     return res.status(200).json(results);
   } catch (error) {
     console.error("Spotify search error:", error);
     return res.status(500).json({ error: "Failed to search Spotify" });
+  }
+};
+
+// GET /songs/spotify/:trackId - Get Spotify track details
+const getSpotifyTrack = async (req, res) => {
+  try {
+    const { trackId } = req.params;
+    const { market } = req.query;
+
+    if (!trackId) {
+      return res.status(400).json({ error: "Track ID is required" });
+    }
+
+    const track = await SpotifyAPI.getTrack(trackId, market);
+
+    return res.status(200).json(track);
+  } catch (error) {
+    console.error("Get Spotify track error:", error);
+    return res.status(500).json({ error: "Failed to get track from Spotify" });
+  }
+};
+
+// GET /songs/spotify/tracks/:trackIds - Get multiple Spotify tracks
+const getSpotifyTracks = async (req, res) => {
+  try {
+    const { trackIds } = req.params;
+    const { market } = req.query;
+
+    if (!trackIds) {
+      return res.status(400).json({ error: "Track IDs are required" });
+    }
+
+    const tracks = await SpotifyAPI.getTracks(trackIds, market);
+
+    return res.status(200).json({ tracks });
+  } catch (error) {
+    console.error("Get Spotify tracks error:", error);
+    return res.status(500).json({ error: "Failed to get tracks from Spotify" });
   }
 };
 
@@ -453,5 +496,7 @@ module.exports = {
   playSong,
   downloadSong,
   searchSpotify,
+  getSpotifyTrack,
+  getSpotifyTracks,
   upload,
 };

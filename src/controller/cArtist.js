@@ -3,9 +3,20 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+<<<<<<< HEAD
 const models = require("../model/mIndex");
 const { registerArtistSchema } = require("../validation/schemas");
 const { Op } = require("sequelize");
+=======
+const {
+  User,
+  Artist,
+  Song,
+  Album,
+  UserFollowArtist,
+} = require("../Model/mIndex");
+const SpotifyAPI = require("../utils/spotifyAPI");
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({
@@ -56,18 +67,19 @@ const getAllArtists = async (req, res) => {
 
     const where = { deleted_at: null };
     if (search) {
-      where[models.Artist.sequelize.Op.or] = [
-        { name: { [models.Artist.sequelize.Op.iLike]: `%${search}%` } },
-        { bio: { [models.Artist.sequelize.Op.iLike]: `%${search}%` } },
+      where[Artist.sequelize.Op.or] = [
+        { name: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
+        { bio: { [Artist.sequelize.Op.iLike]: `%${search}%` } },
       ];
     }
     if (genre) {
-      where.genres = { [models.Artist.sequelize.Op.contains]: [genre] };
+      where.genres = { [Artist.sequelize.Op.contains]: [genre] };
     }
 
-    const artists = await models.Artist.findAndCountAll({
+    const artists = await Artist.findAndCountAll({
       where,
       attributes: [
+<<<<<<< HEAD
       "id",
       "stage_name", 
       "bio",
@@ -76,14 +88,27 @@ const getAllArtists = async (req, res) => {
       "monthly_listeners",
       "verified",
       "created_at"
+=======
+        "id",
+        "stage_name",
+        "real_name",
+        "bio",
+        "genre",
+        "follower_count",
+        "monthly_listeners",
+        "verified",
+        "created_at",
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
       ],
       order: [["follower_count", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
-      include: [{
-      model: models.User,
-      attributes: ['profile_picture']
-      }]
+      include: [
+        {
+          model: User,
+          attributes: ["profile_picture"],
+        },
+      ],
     });
 
     return res.status(200).json({
@@ -106,9 +131,33 @@ const getArtistByName = async (req, res) => {
   try {
     const { name } = req.params;
 
+<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
       attributes: { exclude: ["password_hash", "api_key"] },
+=======
+    const artist = await Artist.findOne({
+      where: { id, deleted_at: null },
+      attributes: { exclude: ["password_hash", "api_key"] },
+      include: [
+        {
+          model: Song,
+          as: "songs",
+          where: { deleted_at: null },
+          required: false,
+          limit: 10,
+          order: [["created_at", "DESC"]],
+        },
+        {
+          model: Album,
+          as: "albums",
+          where: { deleted_at: null },
+          required: false,
+          limit: 10,
+          order: [["created_at", "DESC"]],
+        },
+      ],
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (!artist) {
@@ -360,7 +409,7 @@ const banArtist = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const artist = await models.Artist.findOne({
+    const artist = await Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -383,16 +432,26 @@ const toggleFollowArtist = async (req, res) => {
     const { name } = req.params;
     const userId = req.user.id;
 
+<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
+=======
+    const artist = await Artist.findOne({
+      where: { id, deleted_at: null },
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
+<<<<<<< HEAD
     const existingFollow = await models.UserFollowArtist.findOne({
       where: { user_id: userId, artist_id: artist.id },
+=======
+    const existingFollow = await UserFollowArtist.findOne({
+      where: { user_id: userId, artist_id: id },
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     });
 
     if (existingFollow) {
@@ -404,7 +463,7 @@ const toggleFollowArtist = async (req, res) => {
         .json({ message: "Artist unfollowed", following: false });
     } else {
       // Follow
-      await models.UserFollowArtist.create({
+      await UserFollowArtist.create({
         user_id: userId,
         artist_id: artist.id,
         created_at: new Date(),
@@ -427,19 +486,32 @@ const getArtistSongs = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
+<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
     });
+=======
+    const artist = await Artist.findByPk(id);
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
+<<<<<<< HEAD
     const songs = await models.Song.findAndCountAll({
       where: { artist_id: artist.id, deleted_at: null },
       include: [
         {
           model: models.Album,
           as: "Album",
+=======
+    const songs = await Song.findAndCountAll({
+      where: { artist_id: id, deleted_at: null },
+      include: [
+        {
+          model: Album,
+          as: "album",
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
           attributes: ["id", "title", "cover_image"],
         },
       ],
@@ -470,15 +542,24 @@ const getArtistAlbums = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
+<<<<<<< HEAD
     const artist = await models.Artist.findOne({
       where: { stage_name: name, deleted_at: null },
     });
+=======
+    const artist = await Artist.findByPk(id);
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
+<<<<<<< HEAD
     const albums = await models.Album.findAndCountAll({
       where: { artist_id: artist.id, deleted_at: null },
+=======
+    const albums = await Album.findAndCountAll({
+      where: { artist_id: id, deleted_at: null },
+>>>>>>> 2a500904658d5bf5868d80c8ba652cc56efb9e59
       order: [["release_date", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -509,7 +590,7 @@ const verifyArtist = async (req, res) => {
       return res.status(400).json({ error: "Invalid verification status" });
     }
 
-    const artist = await models.Artist.findOne({
+    const artist = await Artist.findOne({
       where: { id, deleted_at: null },
     });
 
@@ -538,6 +619,66 @@ const verifyArtist = async (req, res) => {
   }
 };
 
+// GET /artists/search/spotify - Search artists on Spotify
+const searchSpotifyArtists = async (req, res) => {
+  try {
+    const { query, limit = 20, offset = 0, market } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const results = await SpotifyAPI.searchArtists(query, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      market,
+    });
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Spotify artist search error:", error);
+    return res.status(500).json({ error: "Failed to search Spotify artists" });
+  }
+};
+
+// GET /artists/spotify/:artistId - Get Spotify artist details
+const getSpotifyArtist = async (req, res) => {
+  try {
+    const { artistId } = req.params;
+
+    if (!artistId) {
+      return res.status(400).json({ error: "Artist ID is required" });
+    }
+
+    const artist = await SpotifyAPI.getArtist(artistId);
+
+    return res.status(200).json(artist);
+  } catch (error) {
+    console.error("Get Spotify artist error:", error);
+    return res.status(500).json({ error: "Failed to get artist from Spotify" });
+  }
+};
+
+// GET /artists/spotify/artists/:artistIds - Get multiple Spotify artists
+const getSpotifyArtists = async (req, res) => {
+  try {
+    const { artistIds } = req.params;
+
+    if (!artistIds) {
+      return res.status(400).json({ error: "Artist IDs are required" });
+    }
+
+    const artists = await SpotifyAPI.getArtists(artistIds);
+
+    return res.status(200).json({ artists });
+  } catch (error) {
+    console.error("Get Spotify artists error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to get artists from Spotify" });
+  }
+};
+
 module.exports = {
   getAllArtists,
   getArtistByName,
@@ -548,5 +689,8 @@ module.exports = {
   getArtistSongs,
   getArtistAlbums,
   verifyArtist,
+  searchSpotifyArtists,
+  getSpotifyArtist,
+  getSpotifyArtists,
   upload,
 };

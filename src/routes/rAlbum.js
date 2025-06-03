@@ -11,12 +11,18 @@ const {
   getAlbumSongs,
   addSongToAlbum,
   removeSongFromAlbum,
+  searchSpotifyAlbums,
+  getSpotifyAlbum,
+  getSpotifyAlbums,
 } = require("../controller/cAlbum");
 
 const { auth, admin, artist } = require("../Middleware/auth");
 
 // Public routes
 router.get("/", getAllAlbums);
+router.get("/search/spotify", searchSpotifyAlbums);
+router.get("/spotify/:albumId", getSpotifyAlbum);
+router.get("/spotify/albums/:albumIds", getSpotifyAlbums);
 router.get("/:id", getAlbumById);
 router.get("/:id/songs", getAlbumSongs);
 
