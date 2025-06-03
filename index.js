@@ -87,7 +87,7 @@ const port = config.app.port;
 const startServer = async () => {
   try {
     // Sync database
-    await syncDatabase();
+    // await syncDatabase();
 
     // Start server
     app.listen(port, () => {

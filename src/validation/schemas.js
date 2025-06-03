@@ -87,16 +87,6 @@ const changePasswordSchema = Joi.object({
   confirmPassword: Joi.string().valid(Joi.ref("newPassword")).required(),
 });
 
-// Artist validation schemas
-const artistRegistrationSchema = Joi.object({
-  stage_name: Joi.string().min(2).max(100).required(),
-  real_name: Joi.string().min(2).max(100).optional(),
-  bio: Joi.string().max(1000).optional(),
-  genre: Joi.string().max(100).optional(),
-  country: Joi.string().max(100).optional(),
-  social_links: Joi.object().optional(),
-});
-
 const updateArtistSchema = Joi.object({
   stage_name: Joi.string().min(2).max(100).optional(),
   real_name: Joi.string().min(2).max(100).optional(),
@@ -104,6 +94,27 @@ const updateArtistSchema = Joi.object({
   genre: Joi.string().max(100).optional(),
   country: Joi.string().max(100).optional(),
   social_links: Joi.object().optional(),
+});
+
+const registerArtistSchema = Joi.object({
+  username: Joi.string().min(3).max(30).required(),
+  name: Joi.string().min(2).max(100).required(),
+  real_name: Joi.string().min(2).max(100).optional().allow(null, ''),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+  dob: Joi.date().iso().optional().allow(null, ''),
+  country: Joi.string().max(100).optional().allow(null, ''),
+  phone: Joi.string().pattern(/^[0-9+\-\s]+$/).optional().allow(null, ''),
+  bio: Joi.string().max(1000).optional().allow(null, ''),
+  gender: Joi.string().valid("male", "female", "other").optional().allow(null, ''),
+  genres: Joi.alternatives().try(
+    Joi.array().items(Joi.string().max(100)),
+    Joi.string()
+  ).optional().allow(null, ''),
+  social_links: Joi.alternatives().try(
+    Joi.object(),
+    Joi.string()
+  ).optional().allow(null, ''),
 });
 
 // Song validation schemas
@@ -218,8 +229,8 @@ module.exports = {
   changePasswordSchema,
 
   // Artist schemas
-  artistRegistrationSchema,
   updateArtistSchema,
+  registerArtistSchema,
 
   // Song schemas
   createSongSchema,

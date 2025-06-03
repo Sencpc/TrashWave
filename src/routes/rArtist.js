@@ -3,10 +3,10 @@ const router = express.Router();
 
 const {
   getAllArtists,
-  getArtistById,
+  getArtistByName,
   registerArtist,
   updateArtist,
-  deleteArtist,
+  banArtist,
   toggleFollowArtist,
   getArtistSongs,
   getArtistAlbums,
@@ -17,19 +17,19 @@ const { auth, admin, artist } = require("../Middleware/auth");
 
 // Public routes
 router.get("/", getAllArtists);
-router.get("/:id", getArtistById);
-router.get("/:id/songs", getArtistSongs);
-router.get("/:id/albums", getArtistAlbums);
+router.get("/:name", getArtistByName);
+router.get("/:name/songs", getArtistSongs);
+router.get("/:name/albums", getArtistAlbums);
 router.post("/register", registerArtist);
 
 // Authenticated routes
-router.post("/:id/follow", auth, toggleFollowArtist);
+router.post("/:name/follow", auth, toggleFollowArtist);
 
 // Artist/Admin routes
-router.put("/:id", auth, artist, updateArtist);
+router.put("/:name", auth, artist, updateArtist);
 
 // Admin only routes
-router.delete("/:id", auth, admin, deleteArtist);
-router.put("/:id/verify", auth, admin, verifyArtist);
+router.delete("/:name", auth, admin, banArtist);
+router.put("/:name/verify", auth, admin, verifyArtist);
 
 module.exports = router;

@@ -4,6 +4,8 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const models = require("../model/mIndex");
+const { registerArtistSchema } = require("../validation/schemas");
+const { Op } = require("sequelize");
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({
@@ -34,6 +36,18 @@ const upload = multer({
   },
 });
 
+function getQuotaByApiLevel(api_level) {
+  switch (api_level) {
+    case "premium":
+      return { streaming_quota: -1, download_quota: -1 }; // unlimited
+    case "premium_lite":
+      return { streaming_quota: -1, download_quota: 10 };
+    case "free":
+    default:
+      return { streaming_quota: 5, download_quota: 0 };
+  }
+}
+
 // GET /artists - Get all artists with pagination and search
 const getAllArtists = async (req, res) => {
   try {
@@ -56,7 +70,6 @@ const getAllArtists = async (req, res) => {
       attributes: [
       "id",
       "stage_name", 
-      "real_name",
       "bio",
       "genre",
       "follower_count",
@@ -88,41 +101,39 @@ const getAllArtists = async (req, res) => {
   }
 };
 
-// GET /artists/:id - Get artist by ID with songs and albums
-const getArtistById = async (req, res) => {
+// GET /artists/:name - Get artist by name with songs and albums
+const getArtistByName = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
 
     const artist = await models.Artist.findOne({
-      where: { id, deleted_at: null },
+      where: { stage_name: name, deleted_at: null },
       attributes: { exclude: ["password_hash", "api_key"] },
-      include: [
-        {
-          model: models.Song,
-          as: "songs",
-          where: { deleted_at: null },
-          required: false,
-          limit: 10,
-          order: [["created_at", "DESC"]],
-        },
-        {
-          model: models.Album,
-          as: "albums",
-          where: { deleted_at: null },
-          required: false,
-          limit: 10,
-          order: [["created_at", "DESC"]],
-        },
-      ],
     });
 
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
-    return res.status(200).json(artist);
+    // Get all songs by this artist
+    const songs = await models.Song.findAll({
+      where: { artist_id: artist.id, deleted_at: null },
+      order: [["created_at", "DESC"]],
+    });
+
+    // Get all albums by this artist
+    const albums = await models.Album.findAll({
+      where: { artist_id: artist.id, deleted_at: null },
+      order: [["created_at", "DESC"]],
+    });
+
+    return res.status(200).json({
+      ...artist.toJSON(),
+      songs,
+      albums,
+    });
   } catch (error) {
-    console.error("Get artist by ID error:", error);
+    console.error("Get artist by name error:", error);
     return res.status(500).json({ error: "Failed to fetch artist" });
   }
 };
@@ -134,20 +145,43 @@ const registerArtist = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
 
+    // Validation
+    const { error } = registerArtistSchema.validate(req.body);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
     try {
-      const { name, email, password, bio, genres, social_links } = req.body;
+      let {
+        username,
+        name,
+        real_name,
+        email,
+        password,
+        dob,
+        country,
+        phone,
+        bio,
+        gender,
+        genres,
+        social_links,
+      } = req.body;
 
       // Validate required fields
-      if (!name || !email || !password) {
+      if (!username || !name || !email || !password) {
         return res
           .status(400)
-          .json({ error: "Name, email, and password are required" });
+          .json({ error: "Username, name, email, and password are required" });
       }
 
-      // Check if email already exists
-      const existingArtist = await Artist.findOne({ where: { email } });
-      if (existingArtist) {
-        return res.status(409).json({ error: "Email already exists" });
+      if (!real_name) {
+        real_name = name.toString();
+      }
+
+      // Check if email or username already exists
+      const existingUser = await models.User.findOne({
+        where: { [Op.or]: [{ email }, { username }] },
+      });
+      if (existingUser) {
+        return res.status(409).json({ error: "Email or username already exists" });
       }
 
       // Hash password
@@ -165,46 +199,99 @@ const registerArtist = async (req, res) => {
       // Parse genres if it's a string
       let genresArray = [];
       if (genres) {
-        genresArray = typeof genres === "string" ? JSON.parse(genres) : genres;
+        if (Array.isArray(genres)) {
+          genresArray = genres;
+        } else if (typeof genres === "string") {
+          try {
+            genresArray = JSON.parse(genres);
+            if (!Array.isArray(genresArray)) {
+              genresArray = [genresArray];
+            }
+          } catch {
+            genresArray = [genres];
+          }
+        }
       }
-
       // Parse social links if it's a string
       let socialLinksObj = {};
       if (social_links) {
-        socialLinksObj =
-          typeof social_links === "string"
-            ? JSON.parse(social_links)
-            : social_links;
+        if (typeof social_links === "string") {
+          try {
+            socialLinksObj = JSON.parse(social_links);
+          } catch {
+            socialLinksObj = {};
+          }
+        } else {
+          socialLinksObj = social_links;
+        }
       }
 
-      const artist = await Artist.create({
-        name,
-        email,
-        password_hash: hashedPassword,
-        bio: bio || null,
-        profile_picture: profilePicPath,
-        genres: genresArray,
-        social_links: socialLinksObj,
-        follower_count: 0,
-        verification_status: "pending",
-        is_active: true,
-        api_key: apiKey,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      let quota = getQuotaByApiLevel("premium");
 
-      // Remove sensitive data
-      const artistData = { ...artist.toJSON() };
-      delete artistData.password_hash;
-      delete artistData.api_key;
+      // Start transaction
+      const result = await models.sequelize.transaction(async (t) => {
+        // Insert to User table
+        const user = await models.User.create(
+          {
+            username,
+            email,
+            password_hash: hashedPassword,
+            full_name : real_name,
+            profile_picture : profilePicPath,
+            date_of_birth: dob || null,
+            country: country || null,
+            phone: phone || null,
+            bio: bio || null,
+            gender: gender || null,
+            role: "artist",
+            streaming_quota: quota.streaming_quota,
+            download_quota: quota.download_quota,
+            subscription_plan_id: 1,
+            subscription_expires_at:null,
+            is_active: true,
+            api_key: apiKey,
+            api_level: "premium",
+            api_quota: quota.streaming_quota,
+            email_verified: 0,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+          { transaction: t }
+        );
+
+        // Insert to Artist table
+        const artist = await models.Artist.create(
+          {
+            user_id: user.id,
+            stage_name: name,
+            real_name: real_name || name,
+            bio: bio || null,
+            genre: genresArray.toString(),
+            country: country || null,
+            verified: 0,
+            follower_count: 0,
+            monthy_listeners: 0,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+          { transaction: t }
+        );
+
+        // Remove sensitive data
+        const artistData = { ...artist.toJSON() };
+        delete artistData.api_key;
+
+        return { user, artist: artistData };
+      });
 
       return res.status(201).json({
         message: "Artist registered successfully",
-        artist: artistData,
+        user: result.user,
+        artist: result.artist,
       });
     } catch (error) {
       console.error("Register artist error:", error);
-      return res.status(500).json({ error: "Registration failed" });
+      return res.status(500).json({ error: "Registration failed" , error : error.message});
     }
   });
 };
@@ -268,8 +355,8 @@ const updateArtist = async (req, res) => {
   });
 };
 
-// DELETE /artists/:id - Delete artist (Admin only)
-const deleteArtist = async (req, res) => {
+// DELETE /artists/:name - Delete artist (Admin only)
+const banArtist = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -283,21 +370,21 @@ const deleteArtist = async (req, res) => {
 
     await artist.update({ deleted_at: new Date() });
 
-    return res.status(200).json({ message: "Artist deleted successfully" });
+    return res.status(200).json({ message: "Artist banned successfully" });
   } catch (error) {
     console.error("Delete artist error:", error);
     return res.status(500).json({ error: "Failed to delete artist" });
   }
 };
 
-// POST /artists/:id/follow - Follow/unfollow artist
+// POST /artists/:name/follow - Follow/unfollow artist
 const toggleFollowArtist = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
     const userId = req.user.id;
 
     const artist = await models.Artist.findOne({
-      where: { id, deleted_at: null },
+      where: { stage_name: name, deleted_at: null },
     });
 
     if (!artist) {
@@ -305,7 +392,7 @@ const toggleFollowArtist = async (req, res) => {
     }
 
     const existingFollow = await models.UserFollowArtist.findOne({
-      where: { user_id: userId, artist_id: id },
+      where: { user_id: userId, artist_id: artist.id },
     });
 
     if (existingFollow) {
@@ -319,7 +406,7 @@ const toggleFollowArtist = async (req, res) => {
       // Follow
       await models.UserFollowArtist.create({
         user_id: userId,
-        artist_id: id,
+        artist_id: artist.id,
         created_at: new Date(),
       });
       await artist.increment("follower_count", { by: 1 });
@@ -333,24 +420,26 @@ const toggleFollowArtist = async (req, res) => {
   }
 };
 
-// GET /artists/:id/songs - Get songs by artist
+// GET /artists/:name/songs - Get songs by artist
 const getArtistSongs = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    const artist = await models.Artist.findByPk(id);
+    const artist = await models.Artist.findOne({
+      where: { stage_name: name, deleted_at: null },
+    });
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
     const songs = await models.Song.findAndCountAll({
-      where: { artist_id: id, deleted_at: null },
+      where: { artist_id: artist.id, deleted_at: null },
       include: [
         {
           model: models.Album,
-          as: "album",
+          as: "Album",
           attributes: ["id", "title", "cover_image"],
         },
       ],
@@ -374,20 +463,22 @@ const getArtistSongs = async (req, res) => {
   }
 };
 
-// GET /artists/:id/albums - Get albums by artist
+// GET /artists/:name/albums - Get albums by artist
 const getArtistAlbums = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    const artist = await models.Artist.findByPk(id);
+    const artist = await models.Artist.findOne({
+      where: { stage_name: name, deleted_at: null },
+    });
     if (!artist) {
       return res.status(404).json({ error: "Artist not found" });
     }
 
     const albums = await models.Album.findAndCountAll({
-      where: { artist_id: id, deleted_at: null },
+      where: { artist_id: artist.id, deleted_at: null },
       order: [["release_date", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -408,7 +499,7 @@ const getArtistAlbums = async (req, res) => {
   }
 };
 
-// PUT /artists/:id/verify - Verify artist (Admin only)
+// PUT /artists/:name/verify - Verify artist (Admin only)
 const verifyArtist = async (req, res) => {
   try {
     const { id } = req.params;
@@ -449,10 +540,10 @@ const verifyArtist = async (req, res) => {
 
 module.exports = {
   getAllArtists,
-  getArtistById,
+  getArtistByName,
   registerArtist,
   updateArtist,
-  deleteArtist,
+  banArtist,
   toggleFollowArtist,
   getArtistSongs,
   getArtistAlbums,
