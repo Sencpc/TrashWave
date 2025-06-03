@@ -362,6 +362,58 @@ const getUserQuota = async (req, res) => {
   }
 };
 
+const createAdmin = async (req, res) => {
+  // Validasi input, gunakan accountSchema tapi ROLE di-set "admin"
+  const { error, value } = accountSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({ errors: error.details.map(e => e.message) });
+  }
+
+  try {
+    // Cek username/email sudah ada
+    const exists = await User.findOne({
+      where: {
+        [Op.or]: [{ username: value.username }, { email: value.email }],
+      },
+    });
+    if (exists) {
+      return res.status(409).json({ error: "Username or email already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(value.password, 10);
+
+    // Generate API key
+    const apiKey = crypto.randomUUID();
+
+    // Set quota admin (bisa unlimited)
+    const quota = { streaming_quota: -1, download_quota: -1 };
+
+    const user = await User.create({
+      username: value.username,
+      email: value.email,
+      password_hash: hashedPassword,
+      full_name: value.full_name,
+      profile_picture: null,
+      date_of_birth: value.date_of_birth,
+      country: value.country,
+      gender: value.gender,
+      ROLE: "admin",
+      streaming_quota: quota.streaming_quota,
+      download_quota: quota.download_quota,
+      is_active: true,
+      api_key: apiKey,
+      api_level: "premium",
+      api_quota: 0,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    return res.status(201).json({ message: "Admin account created", user });
+  } catch (e) {
+    return res.status(500).json({ error: "Admin registration failed", details: e.message });
+  }
+};
+
 function getQuotaByApiLevel(api_level) {
   switch (api_level) {
     case "premium":
@@ -384,4 +436,5 @@ module.exports = {
   getUserByUsername,
   subscribeUser,
   getUserQuota,
+  createAdmin,
 };

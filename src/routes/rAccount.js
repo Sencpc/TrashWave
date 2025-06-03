@@ -10,6 +10,7 @@ const {
   getUserByUsername,
   subscribeUser,
   getUserQuota,
+  createAdmin,
 } = require("../controller/cAccount");
 const { auth } = require("../Middleware/auth");
 
@@ -18,6 +19,7 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.put("/profile", auth, updateProfile);
 router.post("/subscribe", subscribeUser);
+router.post("/admin", createAdmin);
 
 // Tambahan endpoint:
 router.get("/user", getUser); // GET user by API key (header: x-api-key)
