@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const models = require("../model/mIndex");
+const models = require("../Model/mIndex");
 const { registerArtistSchema } = require("../validation/schemas");
 const { Op } = require("sequelize");
 const SpotifyAPI = require("../utils/SpotifyAPI");
@@ -69,14 +69,14 @@ const getAllArtists = async (req, res) => {
     const artists = await models.Artist.findAndCountAll({
       where,
       attributes: [
-      "id",
-      "stage_name", 
-      "bio",
-      "genre",
-      "follower_count",
-      "monthly_listeners",
-      "verified",
-      "created_at"
+        "id",
+        "stage_name",
+        "bio",
+        "genre",
+        "follower_count",
+        "monthly_listeners",
+        "verified",
+        "created_at",
       ],
       order: [["follower_count", "DESC"]],
       limit: parseInt(limit),
@@ -198,7 +198,9 @@ const registerArtist = async (req, res) => {
         where: { [Op.or]: [{ email }, { username }] },
       });
       if (existingUser) {
-        return res.status(409).json({ error: "Email or username already exists" });
+        return res
+          .status(409)
+          .json({ error: "Email or username already exists" });
       }
 
       // Hash password
@@ -253,8 +255,8 @@ const registerArtist = async (req, res) => {
             username,
             email,
             password_hash: hashedPassword,
-            full_name : real_name || name,
-            profile_picture : profilePicPath,
+            full_name: real_name || name,
+            profile_picture: profilePicPath,
             date_of_birth: dob || null,
             country: country || null,
             phone: phone || null,
@@ -264,7 +266,7 @@ const registerArtist = async (req, res) => {
             streaming_quota: quota.streaming_quota,
             download_quota: quota.download_quota,
             subscription_plan_id: 1,
-            subscription_expires_at:null,
+            subscription_expires_at: null,
             is_active: true,
             api_key: apiKey,
             api_level: "premium",
@@ -308,7 +310,9 @@ const registerArtist = async (req, res) => {
       });
     } catch (error) {
       console.error("Register artist error:", error);
-      return res.status(500).json({ error: "Registration failed" , error : error.message});
+      return res
+        .status(500)
+        .json({ error: "Registration failed", error: error.message });
     }
   });
 };
