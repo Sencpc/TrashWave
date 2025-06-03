@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-<<<<<<< HEAD
-const { register, upload, login, logout, updateProfile } = require("../controller/cAccount");
-=======
 const {
   register,
   login,
@@ -13,7 +10,6 @@ const {
   getUserByUsername,
 } = require("../controller/cAccount");
 const { auth } = require("../Middleware/auth");
->>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
 
 router.post("/register", register);
 router.post("/login", login);

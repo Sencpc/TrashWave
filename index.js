@@ -26,11 +26,6 @@ app.use("/storage", express.static(path.join(__dirname, "storage")));
 
 // Import route modules
 const rAccount = require("./src/routes/rAccount");
-<<<<<<< HEAD
-const rPlaylist = require("./src/routes/rPlaylist");
-// const rAlbum = require("./src/routes/rAlbum");
-// const rSong = require("./src/routes/rSong");
-=======
 const rSong = require("./src/routes/rSong");
 const rArtist = require("./src/routes/rArtist");
 const rAlbum = require("./src/routes/rAlbum");
@@ -40,15 +35,9 @@ const rAdmin = require("./src/routes/rAdmin");
 const rSubscription = require("./src/routes/rSubscription");
 const rAd = require("./src/routes/rAd");
 const { getAPIDocumentation } = require("./src/controller/cDocs");
->>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
 
 // Register API endpoints
 app.use("/api/v1/account", rAccount);
-<<<<<<< HEAD
-app.use("/api/v1/playlist", rPlaylist);
-// app.use("/api/v1/album", rAlbum);
-// app.use("/api/v1/song", rSong);
-=======
 app.use("/api/v1/songs", rSong);
 app.use("/api/v1/artists", rArtist);
 app.use("/api/v1/albums", rAlbum);
@@ -57,7 +46,6 @@ app.use("/api/v1/users", rUser);
 app.use("/api/v1/admin", rAdmin);
 app.use("/api/v1/subscriptions", rSubscription);
 app.use("/api/v1/ads", rAd);
->>>>>>> 7abce13f19f62a628bb46071527c06260c252e56
 
 // API Documentation
 app.get("/api/v1/docs", getAPIDocumentation);
