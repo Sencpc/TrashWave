@@ -52,34 +52,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(500),
         allowNull: true,
       },
+      total_getSQ: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 1,
+      },
       target_url: {
         type: DataTypes.STRING(500),
         allowNull: true,
-      },
-      ad_type: {
-        type: DataTypes.ENUM("banner", "video", "audio", "interstitial"),
-        allowNull: false,
-        defaultValue: "banner",
-      },
-      duration: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        comment: "Duration in seconds for video/audio ads",
-      },
-      target_audience: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        comment: "JSON object with targeting criteria",
       },
       budget: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0.0,
-      },
-      cost_per_view: {
-        type: DataTypes.DECIMAL(5, 4),
-        allowNull: false,
-        defaultValue: 0.01,
       },
       total_views: {
         type: DataTypes.INTEGER,
@@ -90,10 +75,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
-      },
-      total_spent: {
-        type: DataTypes.DECIMAL(10, 2),
-        defaultValue: 0.0,
       },
       is_active: {
         type: DataTypes.BOOLEAN,

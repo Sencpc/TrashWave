@@ -355,7 +355,7 @@ const toggleLikePlaylist = async (req, res) => {
 const addSongToPlaylist = async (req, res) => {
   try {
     const { id } = req.params;
-    const { song_id, position } = req.body;
+    const { song_name, position } = req.body;
 
     const playlist = await Playlist.findOne({
       where: { id, deleted_at: null },
@@ -370,8 +370,9 @@ const addSongToPlaylist = async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
+    // Cari lagu berdasarkan judul (title)
     const song = await Song.findOne({
-      where: { id: song_id, deleted_at: null },
+      where: { title: song_name, deleted_at: null },
     });
 
     if (!song) {
@@ -380,7 +381,7 @@ const addSongToPlaylist = async (req, res) => {
 
     // Check if song is already in playlist
     const existingEntry = await PlaylistSong.findOne({
-      where: { playlist_id: id, song_id },
+      where: { playlist_id: id, song_id: song.id },
     });
 
     if (existingEntry) {
@@ -399,9 +400,11 @@ const addSongToPlaylist = async (req, res) => {
 
     await PlaylistSong.create({
       playlist_id: id,
-      song_id,
+      song_id: song.id,
       position: nextPosition,
       added_at: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
     });
 
     // Update playlist stats
@@ -458,33 +461,6 @@ const removeSongFromPlaylist = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Failed to remove song from playlist" });
-  }
-};
-
-// PUT /playlists/:id/songs/reorder - Reorder songs in playlist
-const reorderPlaylistSongs = async (playlistId, newOrder = null) => {
-  try {
-    if (newOrder) {
-      // If new order is provided, update positions based on array
-      for (let i = 0; i < newOrder.length; i++) {
-        await PlaylistSong.update(
-          { position: i + 1 },
-          { where: { playlist_id: playlistId, song_id: newOrder[i] } }
-        );
-      }
-    } else {
-      // Otherwise, just reorder sequentially
-      const songs = await PlaylistSong.findAll({
-        where: { playlist_id: playlistId },
-        order: [["position", "ASC"]],
-      });
-
-      for (let i = 0; i < songs.length; i++) {
-        await songs[i].update({ position: i + 1 });
-      }
-    }
-  } catch (error) {
-    console.error("Reorder playlist songs error:", error);
   }
 };
 
@@ -609,7 +585,6 @@ module.exports = {
   toggleLikePlaylist,
   addSongToPlaylist,
   removeSongFromPlaylist,
-  reorderPlaylistSongs,
   searchSpotifyPlaylists,
   getSpotifyPlaylist,
   searchSpotifyMultiple,
