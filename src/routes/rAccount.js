@@ -9,6 +9,7 @@ const {
   getUser,
   getUserByUsername,
   subscribeUser,
+  getUserQuota,
 } = require("../controller/cAccount");
 const { auth } = require("../Middleware/auth");
 
@@ -21,5 +22,6 @@ router.post("/subscribe", subscribeUser);
 // Tambahan endpoint:
 router.get("/user", getUser); // GET user by API key (header: x-api-key)
 router.get("/user/:username", getUserByUsername); // GET user by username (public)
+router.get("/quota", getUserQuota); // GET /api/v1/account/quota (header: x-api-key)
 
 module.exports = router;

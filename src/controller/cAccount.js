@@ -78,6 +78,9 @@ const register = async (req, res) => {
       // Generate API key
       const apiKey = crypto.randomUUID();
 
+      // Set quota sesuai api_level (default "free" saat register)
+      const quota = getQuotaByApiLevel("free");
+
       // Insert user
       const user = await User.create({
         username: value.username,
@@ -89,8 +92,8 @@ const register = async (req, res) => {
         country: value.country,
         gender: value.gender,
         ROLE: "user",
-        streaming_quota: 0,
-        download_quota: 0,
+        streaming_quota: quota.streaming_quota,
+        download_quota: quota.download_quota,
         is_active: true,
         api_key: apiKey,
         api_level: "free",
@@ -293,8 +296,11 @@ const subscribeUser = async (req, res) => {
     if (value.api_level === "premium") amount = 50000;
     else if (value.api_level === "premium_lite") amount = 25000;
 
-    // Update api_level user
+    // Update api_level dan kuota user
+    const quota = getQuotaByApiLevel(value.api_level);
     user.api_level = value.api_level;
+    user.streaming_quota = quota.streaming_quota;
+    user.download_quota = quota.download_quota;
     await user.save();
 
     // Buat transaksi pembayaran
@@ -333,6 +339,41 @@ const subscribeUser = async (req, res) => {
   }
 };
 
+const getUserQuota = async (req, res) => {
+  try {
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+    const user = await User.findOne({
+      where: { api_key: apiKey },
+      attributes: ["username", "streaming_quota", "download_quota"],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json({
+      username: user.username,
+      streaming_quota: user.streaming_quota,
+      download_quota: user.download_quota,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to get user quota" });
+  }
+};
+
+function getQuotaByApiLevel(api_level) {
+  switch (api_level) {
+    case "premium":
+      return { streaming_quota: -1, download_quota: -1 }; // unlimited
+    case "premium_lite":
+      return { streaming_quota: -1, download_quota: 10 };
+    case "free":
+    default:
+      return { streaming_quota: 5, download_quota: 0 };
+  }
+}
+
 module.exports = {
   register,
   upload,
@@ -342,4 +383,5 @@ module.exports = {
   getUser,
   getUserByUsername,
   subscribeUser,
+  getUserQuota,
 };
