@@ -1,6 +1,6 @@
 -- Database: db_trashwave
 -- TrashWave Music Streaming Platform Database Schema
--- Updated: 2025-05-29
+-- Updated: 2025-06-03
 
 CREATE DATABASE IF NOT EXISTS db_trashwave;
 USE db_trashwave;
@@ -33,7 +33,8 @@ CREATE TABLE users (
   api_level ENUM('free','premium_lite','premium') NOT NULL DEFAULT 'free',
   api_quota INT NOT NULL DEFAULT 100,
   last_login DATETIME,
-  email_verified TINYINT(1) DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  email_verified TINYINT(1) DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL
 );
@@ -87,7 +88,8 @@ CREATE TABLE subscription_plans (
   download_limit INT DEFAULT 0 COMMENT 'Daily download limit',
   features JSON COMMENT 'Plan features as JSON',
   is_active TINYINT(1) DEFAULT 1,
-  trial_period_days INT DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  trial_period_days INT DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL
 );
@@ -113,7 +115,8 @@ CREATE TABLE artists (
   follower_count INT DEFAULT 0,
   monthly_listeners INT DEFAULT 0,
   total_plays BIGINT DEFAULT 0,
-  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -135,7 +138,8 @@ CREATE TABLE albums (
   is_explicit TINYINT(1) DEFAULT 0,
   play_count BIGINT DEFAULT 0,
   like_count INT DEFAULT 0,
-  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
@@ -161,7 +165,8 @@ CREATE TABLE songs (
   explicit_content TINYINT(1) DEFAULT 0,
   file_size BIGINT DEFAULT 0 COMMENT 'File size in bytes',
   bitrate INT DEFAULT 320 COMMENT 'Audio bitrate',
-  spotify_id VARCHAR(100) UNIQUE,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  spotify_id VARCHAR(100) UNIQUE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE,
@@ -180,7 +185,8 @@ CREATE TABLE playlists (
   is_official TINYINT(1) DEFAULT 0,
   like_count INT DEFAULT 0,
   total_songs INT DEFAULT 0,
-  total_duration INT DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total_duration INT DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -195,7 +201,8 @@ CREATE TABLE playlist_songs (
   POSITION INT NOT NULL,
   added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_playlist_song (playlist_id, song_id),
   FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
@@ -222,7 +229,8 @@ CREATE TABLE ads (
   total_spent DECIMAL(10,2) DEFAULT 0.00,
   is_active TINYINT(1) DEFAULT 1,
   start_date DATETIME,
-  end_date DATETIME,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  end_date DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (advertiser_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -239,7 +247,8 @@ CREATE TABLE ad_views (
   user_agent TEXT,
   referrer VARCHAR(500),
   device_info JSON COMMENT 'Device information as JSON',
-  location_data JSON COMMENT 'Location data as JSON',  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  location_data JSON COMMENT 'Location data as JSON',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ad_id) REFERENCES ads(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -261,7 +270,8 @@ CREATE TABLE payment_transactions (
   processed_at DATETIME,
   expires_at DATETIME,
   failure_reason TEXT,
-  metadata JSON COMMENT 'Additional payment metadata',  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  metadata JSON COMMENT 'Additional payment metadata',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -275,7 +285,8 @@ CREATE TABLE user_follow_artists (
   user_id INT NOT NULL,
   artist_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_artist (user_id, artist_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
@@ -288,7 +299,8 @@ CREATE TABLE user_like_songs (
   user_id INT NOT NULL,
   song_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_song (user_id, song_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
@@ -301,7 +313,8 @@ CREATE TABLE user_like_playlists (
   user_id INT NOT NULL,
   playlist_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_playlist (user_id, playlist_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
@@ -314,7 +327,8 @@ CREATE TABLE user_like_albums (
   user_id INT NOT NULL,
   album_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  deleted_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
   UNIQUE KEY unique_user_album (user_id, album_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
@@ -328,7 +342,8 @@ CREATE TABLE user_downloads (
   song_id INT NOT NULL,
   download_quality ENUM('standard', 'high', 'lossless') DEFAULT 'standard',
   file_size BIGINT DEFAULT 0,
-  download_completed TINYINT(1) DEFAULT 0,  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  download_completed TINYINT(1) DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at DATETIME DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -343,35 +358,37 @@ FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans(id) ON DELETE S
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
 
--- Insert Users
-INSERT INTO users (username, email, password_hash, full_name, profile_picture, date_of_birth, country, phone, bio, gender, ROLE, streaming_quota, download_quota, subscription_plan_id, subscription_expires_at, is_active, api_level, api_quota, last_login, email_verified, created_at) VALUES
+-- Insert Users (with Node.js bcrypt compatible hashes)
+-- Password for all users: "password"
+-- Hash generated using: await bcrypt.hash('password', 10)
+INSERT INTO users (username, email, password_hash, full_name, profile_picture, date_of_birth, country, phone, bio, gender, ROLE, streaming_quota, download_quota, subscription_plan_id, subscription_expires_at, is_active, api_level, api_quota, last_login, email_verified, created_at, updated_at) VALUES
 -- Admin Users
-('admin_trashwave', 'admin@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'TrashWave Administrator', 'https://cdn.trashwave.id/profiles/admin.jpg', '1990-01-15', 'Indonesia', '+62811234567', 'Platform Administrator', 'other', 'admin', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-03 08:30:00', 1, '2024-01-01 00:00:00'),
+('admin_trashwave', 'admin@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'TrashWave Administrator', 'https://cdn.trashwave.id/profiles/admin.jpg', '1990-01-15', 'Indonesia', '+62811234567', 'Platform Administrator', 'other', 'admin', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-03 08:30:00', 1, '2024-01-01 00:00:00', '2024-01-01 00:00:00'),
 
 -- Artist Users
-('raisa_official', 'raisa@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Raisa Andriana', 'https://cdn.trashwave.id/profiles/raisa.jpg', '1990-06-06', 'Indonesia', '+628123456789', 'Indonesian R&B Singer', 'female', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 20:15:00', 1, '2024-02-15 10:30:00'),
-('afgan_official', 'afgan@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Afgansyah Reza', 'https://cdn.trashwave.id/profiles/afgan.jpg', '1989-05-27', 'Indonesia', '+628123456790', 'Indonesian Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 18:45:00', 1, '2024-03-10 14:20:00'),
-('isyana_official', 'isyana@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Isyana Sarasvati', 'https://cdn.trashwave.id/profiles/isyana.jpg', '1993-05-02', 'Indonesia', '+628123456791', 'Indonesian Pop Classical Singer', 'female', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-01 22:30:00', 1, '2024-03-20 09:15:00'),
-('tulus_official', 'tulus@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Muhammad Tulus', 'https://cdn.trashwave.id/profiles/tulus.jpg', '1987-08-20', 'Indonesia', '+628123456792', 'Indonesian Jazz Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 16:20:00', 1, '2024-04-05 11:45:00'),
-('ardhito_official', 'ardhito@trashwave.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ardhito Rifqi Pramono', 'https://cdn.trashwave.id/profiles/ardhito.jpg', '1995-05-22', 'Indonesia', '+628123456793', 'Indonesian Indie Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-01 19:10:00', 1, '2024-04-15 13:25:00'),
+('raisa_official', 'raisa@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Raisa Andriana', 'https://cdn.trashwave.id/profiles/raisa.jpg', '1990-06-06', 'Indonesia', '+628123456789', 'Indonesian R&B Singer', 'female', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 20:15:00', 1, '2024-02-15 10:30:00', '2024-02-15 10:30:00'),
+('afgan_official', 'afgan@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Afgansyah Reza', 'https://cdn.trashwave.id/profiles/afgan.jpg', '1989-05-27', 'Indonesia', '+628123456790', 'Indonesian Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 18:45:00', 1, '2024-03-10 14:20:00', '2024-03-10 14:20:00'),
+('isyana_official', 'isyana@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Isyana Sarasvati', 'https://cdn.trashwave.id/profiles/isyana.jpg', '1993-05-02', 'Indonesia', '+628123456791', 'Indonesian Pop Classical Singer', 'female', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-01 22:30:00', 1, '2024-03-20 09:15:00', '2024-03-20 09:15:00'),
+('tulus_official', 'tulus@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Muhammad Tulus', 'https://cdn.trashwave.id/profiles/tulus.jpg', '1987-08-20', 'Indonesia', '+628123456792', 'Indonesian Jazz Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-02 16:20:00', 1, '2024-04-05 11:45:00', '2024-04-05 11:45:00'),
+('ardhito_official', 'ardhito@trashwave.id', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Ardhito Rifqi Pramono', 'https://cdn.trashwave.id/profiles/ardhito.jpg', '1995-05-22', 'Indonesia', '+628123456793', 'Indonesian Indie Pop Singer', 'male', 'artist', -1, -1, 3, '2025-12-31 23:59:59', 1, 'premium', -1, '2025-06-01 19:10:00', 1, '2024-04-15 13:25:00', '2024-04-15 13:25:00'),
 
 -- Regular Premium Users
-('budi_music', 'budi@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Budi Santoso', 'https://cdn.trashwave.id/profiles/budi.jpg', '1995-08-12', 'Indonesia', '+628123456794', 'Music lover from Jakarta', 'male', 'user', -1, -1, 3, '2025-08-15 23:59:59', 1, 'premium', -1, '2025-06-03 07:45:00', 1, '2024-05-01 16:30:00'),
-('sari_melody', 'sari@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Sari Melodi', 'https://cdn.trashwave.id/profiles/sari.jpg', '1992-12-03', 'Indonesia', '+628123456795', 'Indie music enthusiast', 'female', 'user', -1, -1, 3, '2025-09-20 23:59:59', 1, 'premium', -1, '2025-06-02 21:15:00', 1, '2024-05-15 09:20:00'),
-('andre_beats', 'andre@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Andre Wijaya', 'https://cdn.trashwave.id/profiles/andre.jpg', '1988-03-25', 'Indonesia', '+628123456796', 'Electronic music producer', 'male', 'user', 500, 25, 2, '2025-07-10 23:59:59', 1, 'premium_lite', 500, '2025-06-02 14:30:00', 1, '2024-06-01 12:15:00'),
+('budi_music', 'budi@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Budi Santoso', 'https://cdn.trashwave.id/profiles/budi.jpg', '1995-08-12', 'Indonesia', '+628123456794', 'Music lover from Jakarta', 'male', 'user', -1, -1, 3, '2025-08-15 23:59:59', 1, 'premium', -1, '2025-06-03 07:45:00', 1, '2024-05-01 16:30:00', '2024-05-01 16:30:00'),
+('sari_melody', 'sari@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Sari Melodi', 'https://cdn.trashwave.id/profiles/sari.jpg', '1992-12-03', 'Indonesia', '+628123456795', 'Indie music enthusiast', 'female', 'user', -1, -1, 3, '2025-09-20 23:59:59', 1, 'premium', -1, '2025-06-02 21:15:00', 1, '2024-05-15 09:20:00', '2024-05-15 09:20:00'),
+('andre_beats', 'andre@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Andre Wijaya', 'https://cdn.trashwave.id/profiles/andre.jpg', '1988-03-25', 'Indonesia', '+628123456796', 'Electronic music producer', 'male', 'user', 500, 25, 2, '2025-07-10 23:59:59', 1, 'premium_lite', 500, '2025-06-02 14:30:00', 1, '2024-06-01 12:15:00', '2024-06-01 12:15:00'),
 
 -- Free Users
-('dinda_free', 'dinda@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dinda Permata', NULL, '1998-07-18', 'Indonesia', '+628123456797', 'College student', 'female', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-03 06:20:00', 1, '2024-08-10 14:45:00'),
-('ryan_student', 'ryan@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ryan Pratama', NULL, '1999-11-08', 'Indonesia', '+628123456798', 'High school student', 'male', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-02 19:45:00', 1, '2024-09-05 10:30:00'),
-('maya_casual', 'maya@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Maya Sari', NULL, '1994-04-14', 'Indonesia', '+628123456799', 'Casual listener', 'female', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-01 15:20:00', 1, '2024-10-20 08:15:00');
+('dinda_free', 'dinda@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Dinda Permata', NULL, '1998-07-18', 'Indonesia', '+628123456797', 'College student', 'female', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-03 06:20:00', 1, '2024-08-10 14:45:00', '2024-08-10 14:45:00'),
+('ryan_student', 'ryan@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Ryan Pratama', NULL, '1999-11-08', 'Indonesia', '+628123456798', 'High school student', 'male', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-02 19:45:00', 1, '2024-09-05 10:30:00', '2024-09-05 10:30:00'),
+('maya_casual', 'maya@gmail.com', '$2b$10$EUXp8UnbZ4PpJVgQdpHGcOmoXdn8b1xFocgqSC9a0SxR4nShBKoWK', 'Maya Sari', NULL, '1994-04-14', 'Indonesia', '+628123456799', 'Casual listener', 'female', 'user', 100, 5, 1, NULL, 1, 'free', 100, '2025-06-01 15:20:00', 1, '2024-10-20 08:15:00', '2024-10-20 08:15:00');
 
--- Insert Artists
-INSERT INTO artists (user_id, stage_name, real_name, bio, genre, country, social_links, verified, follower_count, monthly_listeners, total_plays, spotify_id, created_at) VALUES
-(2, 'Raisa', 'Raisa Andriana', 'Indonesian R&B and pop singer known for her powerful vocals and emotional ballads. Winner of multiple Indonesian music awards.', 'R&B, Pop', 'Indonesia', '{"instagram": "@raisa6690", "twitter": "@raisa6690", "youtube": "RaisaOfficial", "tiktok": "@raisa6690"}', 1, 2500000, 1800000, 450000000, 'raisa_spotify_id', '2024-02-15 10:30:00'),
-(3, 'Afgan', 'Afgansyah Reza', 'Indonesian pop singer and songwriter with a distinctive voice. Known for romantic ballads and contemporary pop songs.', 'Pop, R&B', 'Indonesia', '{"instagram": "@afgansyah.reza", "twitter": "@afgansyahreza", "youtube": "AfganOfficial", "tiktok": "@afgansyahreza"}', 1, 1800000, 1200000, 320000000, 'afgan_spotify_id', '2024-03-10 14:20:00'),
-(4, 'Isyana Sarasvati', 'Isyana Sarasvati', 'Classical trained pop singer with operatic vocals. Known for blending classical music with contemporary pop.', 'Pop, Classical', 'Indonesia', '{"instagram": "@isyanasarasvati", "twitter": "@isyanasarasvati", "youtube": "IsyanaOfficial", "tiktok": "@isyanasarasvati"}', 1, 1500000, 900000, 280000000, 'isyana_spotify_id', '2024-03-20 09:15:00'),
-(5, 'Tulus', 'Muhammad Tulus', 'Indonesian jazz-pop singer known for his smooth voice and heartfelt lyrics. Popular for acoustic and jazz-influenced songs.', 'Jazz, Pop', 'Indonesia', '{"instagram": "@tulus_lius", "twitter": "@tulus_lius", "youtube": "TulusOfficial", "tiktok": "@tulus_lius"}', 1, 2200000, 1500000, 380000000, 'tulus_spotify_id', '2024-04-05 11:45:00'),
-(6, 'Ardhito Pramono', 'Ardhito Rifqi Pramono', 'Indonesian indie pop singer-songwriter and actor. Known for his dreamy, lo-fi pop sound and introspective lyrics.', 'Indie Pop, Alternative', 'Indonesia', '{"instagram": "@ardhitopramono", "twitter": "@ardhitopramono", "youtube": "ArdhitoOfficial", "tiktok": "@ardhitopramono"}', 1, 800000, 600000, 150000000, 'ardhito_spotify_id', '2024-04-15 13:25:00');
+-- Insert Artists (Links to the user accounts created above)
+INSERT INTO artists (user_id, stage_name, real_name, bio, genre, country, social_links, verified, follower_count, monthly_listeners, total_plays, spotify_id, created_at, updated_at) VALUES
+(2, 'Raisa', 'Raisa Andriana', 'Indonesian R&B and pop singer known for her powerful vocals and emotional ballads. Winner of multiple Indonesian music awards.', 'R&B, Pop', 'Indonesia', '{"instagram": "@raisa6690", "twitter": "@raisa6690", "youtube": "RaisaOfficial", "tiktok": "@raisa6690"}', 1, 2500000, 1800000, 450000000, 'raisa_spotify_id', '2024-02-15 10:30:00', '2024-02-15 10:30:00'),
+(3, 'Afgan', 'Afgansyah Reza', 'Indonesian pop singer and songwriter with a distinctive voice. Known for romantic ballads and contemporary pop songs.', 'Pop, R&B', 'Indonesia', '{"instagram": "@afgansyah.reza", "twitter": "@afgansyahreza", "youtube": "AfganOfficial", "tiktok": "@afgansyahreza"}', 1, 1800000, 1200000, 320000000, 'afgan_spotify_id', '2024-03-10 14:20:00', '2024-03-10 14:20:00'),
+(4, 'Isyana Sarasvati', 'Isyana Sarasvati', 'Classical trained pop singer with operatic vocals. Known for blending classical music with contemporary pop.', 'Pop, Classical', 'Indonesia', '{"instagram": "@isyanasarasvati", "twitter": "@isyanasarasvati", "youtube": "IsyanaOfficial", "tiktok": "@isyanasarasvati"}', 1, 1500000, 900000, 280000000, 'isyana_spotify_id', '2024-03-20 09:15:00', '2024-03-20 09:15:00'),
+(5, 'Tulus', 'Muhammad Tulus', 'Indonesian jazz-pop singer known for his smooth voice and heartfelt lyrics. Popular for acoustic and jazz-influenced songs.', 'Jazz, Pop', 'Indonesia', '{"instagram": "@tulus_lius", "twitter": "@tulus_lius", "youtube": "TulusOfficial", "tiktok": "@tulus_lius"}', 1, 2200000, 1500000, 380000000, 'tulus_spotify_id', '2024-04-05 11:45:00', '2024-04-05 11:45:00'),
+(6, 'Ardhito Pramono', 'Ardhito Rifqi Pramono', 'Indonesian indie pop singer-songwriter and actor. Known for his dreamy, lo-fi pop sound and introspective lyrics.', 'Indie Pop, Alternative', 'Indonesia', '{"instagram": "@ardhitopramono", "twitter": "@ardhitopramono", "youtube": "ArdhitoOfficial", "tiktok": "@ardhitopramono"}', 1, 800000, 600000, 150000000, 'ardhito_spotify_id', '2024-04-15 13:25:00', '2024-04-15 13:25:00');
 
 -- Insert Albums
 INSERT INTO albums (title, artist_id, cover_image, release_date, DESCRIPTION, genre, total_tracks, duration_seconds, is_single, is_explicit, play_count, like_count, spotify_id, created_at) VALUES
@@ -441,7 +458,41 @@ INSERT INTO playlists (NAME, DESCRIPTION, user_id, cover_image, is_public, is_of
 ('Workout Mix', 'High energy songs for exercise', 11, NULL, 1, 0, 56, 16, 4320, '2024-09-10 18:20:00');
 
 -- Insert Playlist Songs
-INSERT INTO playlist_songs (playlist_id, song_id, POSITION, added_at) VALUES
+INSERT INTO playlist_songs (playlist_id, song_id, POSITION, added_at, created_at) VALUES
 -- Indonesian Pop Hits
-(1, 1, 1, '2024-02-01 10:05:00'), (1, 2, 2, '2024-02-01 10:06:00'), (1, 3, 3, '2024-02-01 10:07:00'),
-(1, 4, 4, '2024-02-01 10:08:00'), (1, 5, 5, '2024-02-01 10:09:00'), (1, 6, 6, '2024-02-01 10:10:00');
+(1, 1, 1, '2024-02-01 10:05:00', '2024-02-01 10:05:00'), 
+(1, 2, 2, '2024-02-01 10:06:00', '2024-02-01 10:06:00'), 
+(1, 3, 3, '2024-02-01 10:07:00', '2024-02-01 10:07:00'),
+(1, 4, 4, '2024-02-01 10:08:00', '2024-02-01 10:08:00'), 
+(1, 5, 5, '2024-02-01 10:09:00', '2024-02-01 10:09:00'), 
+(1, 6, 6, '2024-02-01 10:10:00', '2024-02-01 10:10:00'),
+
+-- New Indonesian Music
+(2, 4, 1, '2024-03-01 10:05:00', '2024-03-01 10:05:00'),
+(2, 7, 2, '2024-03-01 10:06:00', '2024-03-01 10:06:00'),
+(2, 12, 3, '2024-03-01 10:07:00', '2024-03-01 10:07:00'),
+(2, 15, 4, '2024-03-01 10:08:00', '2024-03-01 10:08:00'),
+
+-- Indonesian R&B Collection  
+(3, 1, 1, '2024-04-01 10:05:00', '2024-04-01 10:05:00'),
+(3, 5, 2, '2024-04-01 10:06:00', '2024-04-01 10:06:00'),
+(3, 6, 3, '2024-04-01 10:07:00', '2024-04-01 10:07:00'),
+(3, 8, 4, '2024-04-01 10:08:00', '2024-04-01 10:08:00'),
+
+-- Indie Indonesia
+(4, 15, 1, '2024-05-01 10:05:00', '2024-05-01 10:05:00'),
+(4, 16, 2, '2024-05-01 10:06:00', '2024-05-01 10:06:00'),
+(4, 17, 3, '2024-05-01 10:07:00', '2024-05-01 10:07:00'),
+
+-- User Playlists
+(5, 1, 1, '2024-05-15 14:35:00', '2024-05-15 14:35:00'),
+(5, 3, 2, '2024-05-15 14:36:00', '2024-05-15 14:36:00'),
+(5, 11, 3, '2024-05-15 14:37:00', '2024-05-15 14:37:00'),
+
+(6, 15, 1, '2024-05-20 16:50:00', '2024-05-20 16:50:00'),
+(6, 17, 2, '2024-05-20 16:51:00', '2024-05-20 16:51:00'),
+(6, 10, 3, '2024-05-20 16:52:00', '2024-05-20 16:52:00'),
+
+(7, 12, 1, '2024-06-01 08:20:00', '2024-06-01 08:20:00'),
+(7, 11, 2, '2024-06-01 08:21:00', '2024-06-01 08:21:00'),
+(7, 4, 3, '2024-06-01 08:22:00', '2024-06-01 08:22:00');

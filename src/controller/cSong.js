@@ -1,12 +1,14 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const { Op } = require("sequelize");
 const {
   Song,
   Artist,
   Album,
   UserLikeSong,
   UserDownload,
+  User,
 } = require("../Model/mIndex");
 const SpotifyAPI = require("../utils/SpotifyAPI");
 
@@ -34,8 +36,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: (file) =>
-      file.fieldname === "cover_image" ? 5 * 1024 * 1024 : 50 * 1024 * 1024, // 5MB for images, 50MB for audio
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
   },
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "cover_image") {
@@ -64,41 +65,19 @@ const upload = multer({
 // GET /songs - Get all songs with pagination and filters
 const getAllSongs = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
-      genre,
-      artist_id,
-      album_id,
-      search,
-    } = req.query;
+    const { page = 1, limit = 20, search } = req.query;
     const offset = (page - 1) * limit;
 
     const where = { deleted_at: null };
-    if (genre) where.genre = genre;
-    if (artist_id) where.artist_id = artist_id;
-    if (album_id) where.album_id = album_id;
     if (search) {
-      where[Song.sequelize.Op.or] = [
-        { title: { [Song.sequelize.Op.iLike]: `%${search}%` } },
-        { lyrics: { [Song.sequelize.Op.iLike]: `%${search}%` } },
+      where[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { lyrics: { [Op.iLike]: `%${search}%` } },
       ];
     }
 
     const songs = await Song.findAndCountAll({
       where,
-      include: [
-        {
-          model: Artist,
-          as: "artist",
-          attributes: ["id", "name", "profile_picture"],
-        },
-        {
-          model: Album,
-          as: "album",
-          attributes: ["id", "title", "cover_image"],
-        },
-      ],
       order: [["created_at", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -123,14 +102,13 @@ const getAllSongs = async (req, res) => {
 const getSongById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const song = await Song.findOne({
       where: { id, deleted_at: null },
       include: [
         {
           model: Artist,
           as: "artist",
-          attributes: ["id", "name", "profile_picture"],
+          attributes: ["id", "stage_name", "real_name"],
         },
         {
           model: Album,
@@ -170,12 +148,10 @@ const createSong = async (req, res) => {
         lyrics,
         explicit_content,
         release_date,
-      } = req.body;
-
-      // Validate required fields
-      if (!title || !genre || !duration || !req.files?.audio_file) {
+      } = req.body; // Validate required fields
+      if (!title || !duration || !req.files?.audio_file) {
         return res.status(400).json({
-          error: "Title, genre, duration, and audio file are required",
+          error: "Title, duration, and audio file are required",
         });
       }
 
@@ -185,6 +161,20 @@ const createSong = async (req, res) => {
         if (!album) {
           return res.status(404).json({ error: "Album not found" });
         }
+      } // Get artist_id - if user is an artist, find their artist record
+      let artistId;
+      if (req.user.ROLE === "artist") {
+        const artist = await Artist.findOne({
+          where: { user_id: req.user.id },
+        });
+        if (!artist) {
+          return res.status(404).json({ error: "Artist profile not found" });
+        }
+        artistId = artist.id;
+      } else if (req.user.ROLE === "admin" && req.body.artist_id) {
+        artistId = req.body.artist_id;
+      } else {
+        return res.status(403).json({ error: "Only artists can create songs" });
       }
 
       const audioFile = req.files.audio_file[0];
@@ -192,29 +182,24 @@ const createSong = async (req, res) => {
 
       const song = await Song.create({
         title,
-        artist_id:
-          req.user.role === "artist" ? req.user.id : req.body.artist_id,
+        artist_id: artistId,
         album_id: album_id || null,
-        genre,
-        duration: parseInt(duration),
-        file_path: audioFile.path.replace(/\\/g, "/"),
-        cover_image: coverImage ? coverImage.path.replace(/\\/g, "/") : null,
+        file_url: audioFile.path.replace(/\\/g, "/"),
+        duration_seconds: parseInt(duration),
         lyrics: lyrics || null,
-        explicit_content: explicit_content === "true",
+        is_explicit: explicit_content === "true",
         release_date: release_date || new Date(),
         play_count: 0,
         like_count: 0,
-        download_count: 0,
         created_at: new Date(),
         updated_at: new Date(),
       });
-
       const songWithDetails = await Song.findByPk(song.id, {
         include: [
           {
             model: Artist,
             as: "artist",
-            attributes: ["id", "name", "profile_picture"],
+            attributes: ["id", "stage_name", "real_name"],
           },
           {
             model: Album,
@@ -238,9 +223,7 @@ const createSong = async (req, res) => {
 const updateSong = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, album_id, genre, duration, lyrics, explicit_content } =
-      req.body;
-
+    const { title, album_id, duration, lyrics, explicit_content } = req.body;
     const song = await Song.findOne({
       where: { id, deleted_at: null },
     });
@@ -250,28 +233,29 @@ const updateSong = async (req, res) => {
     }
 
     // Check ownership for artists
-    if (req.user.role === "artist" && song.artist_id !== req.user.id) {
-      return res.status(403).json({ error: "Access denied" });
+    if (req.user.ROLE === "artist") {
+      const artist = await Artist.findOne({ where: { user_id: req.user.id } });
+      if (!artist || song.artist_id !== artist.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
     }
 
     const updateData = {};
     if (title) updateData.title = title;
     if (album_id !== undefined) updateData.album_id = album_id;
-    if (genre) updateData.genre = genre;
-    if (duration) updateData.duration = parseInt(duration);
+    if (duration) updateData.duration_seconds = parseInt(duration);
     if (lyrics !== undefined) updateData.lyrics = lyrics;
     if (explicit_content !== undefined)
-      updateData.explicit_content = explicit_content === "true";
+      updateData.is_explicit = explicit_content === "true";
     updateData.updated_at = new Date();
 
     await song.update(updateData);
-
     const updatedSong = await Song.findByPk(id, {
       include: [
         {
           model: Artist,
           as: "artist",
-          attributes: ["id", "name", "profile_picture"],
+          attributes: ["id", "stage_name", "real_name"],
         },
         {
           model: Album,
@@ -301,11 +285,12 @@ const deleteSong = async (req, res) => {
 
     if (!song) {
       return res.status(404).json({ error: "Song not found" });
-    }
-
-    // Check ownership for artists
-    if (req.user.role === "artist" && song.artist_id !== req.user.id) {
-      return res.status(403).json({ error: "Access denied" });
+    } // Check ownership for artists
+    if (req.user.ROLE === "artist") {
+      const artist = await Artist.findOne({ where: { user_id: req.user.id } });
+      if (!artist || song.artist_id !== artist.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
     }
 
     await song.update({ deleted_at: new Date() });
@@ -345,7 +330,6 @@ const toggleLikeSong = async (req, res) => {
       await UserLikeSong.create({
         user_id: userId,
         song_id: id,
-        created_at: new Date(),
       });
       await song.increment("like_count", { by: 1 });
       return res.status(200).json({ message: "Song liked", liked: true });
@@ -356,10 +340,11 @@ const toggleLikeSong = async (req, res) => {
   }
 };
 
-// POST /songs/:id/play - Increment play count
+// POST /songs/:id/play - Increment play count and decrement streaming quota
 const playSong = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
 
     const song = await Song.findOne({
       where: { id, deleted_at: null },
@@ -369,9 +354,43 @@ const playSong = async (req, res) => {
       return res.status(404).json({ error: "Song not found" });
     }
 
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.is_active) {
+      return res.status(403).json({ error: "User account is inactive" });
+    }
+
+    if (user.api_level !== "premium" && user.api_level !== "premium_lite") {
+      if (user.streaming_quota <= 0) {
+        return res.status(403).json({
+          error:
+            "Streaming quota exceeded. Upgrade to premium for unlimited streaming.",
+        });
+      }
+
+      // Decrement streaming quota for non-premium active users
+      await user.decrement("streaming_quota", { by: 1 });
+    }
+
+    // Increment play count
     await song.increment("play_count", { by: 1 });
 
-    return res.status(200).json({ message: "Play count updated" });
+    // Prepare response data
+    const responseData = {
+      message: "Play count updated",
+      play_count: song.play_count + 1,
+    };
+
+    // Add quota info for non-premium users
+    if (user.is_active && user.api_level !== "premium") {
+      responseData.remaining_quota = user.streaming_quota - 1;
+      responseData.api_level = user.api_level;
+    }
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Play song error:", error);
     return res.status(500).json({ error: "Failed to update play count" });
@@ -384,11 +403,24 @@ const downloadSong = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    // Check if user has premium subscription
-    if (req.user.subscription_plan === "free") {
-      return res
-        .status(403)
-        .json({ error: "Premium subscription required for downloads" });
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.is_active) {
+      return res.status(403).json({ error: "User account is inactive" });
+    }
+
+    if (user.api_level !== "premium") {
+      if (user.download_quota <= 0) {
+        return res.status(403).json({
+          error:
+            "download quota exceeded. Upgrade to premium for unlimited download.",
+        });
+      }
+
+      await user.decrement("download_quota", { by: 1 });
     }
 
     const song = await Song.findOne({
@@ -398,28 +430,27 @@ const downloadSong = async (req, res) => {
     if (!song) {
       return res.status(404).json({ error: "Song not found" });
     }
-
-    // Check download quota
-    if (req.user.download_quota <= 0) {
-      return res.status(403).json({ error: "Download quota exceeded" });
-    }
-
-    // Record download
     await UserDownload.create({
       user_id: userId,
       song_id: id,
-      download_date: new Date(),
     });
 
-    // Update download count and user quota
-    await song.increment("download_count", { by: 1 });
-    await req.user.decrement("download_quota", { by: 1 });
+    // Update song download count (using existing like_count field as proxy)
+    await song.increment("like_count", { by: 1 });
 
-    return res.status(200).json({
+    // Prepare response data
+    const responseData = {
       message: "Song download recorded",
       download_url: `/api/v1/songs/${id}/file`,
-      remaining_quota: req.user.download_quota - 1,
-    });
+    };
+
+    // Add quota info for non-premium users
+    if (user.api_level !== "premium") {
+      responseData.remaining_quota = user.download_quota - 1;
+      responseData.api_level = user.api_level;
+    }
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Download song error:", error);
     return res.status(500).json({ error: "Failed to download song" });

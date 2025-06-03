@@ -2,14 +2,21 @@ const axios = require("axios");
 
 class SpotifyAPI {
   constructor() {
-    this.clientId = process.env.Client_ID;
-    this.clientSecret = process.env.Client_Secret;
+    this.clientId = process.env.SPOTIFY_CLIENT_ID;
+    this.clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
     this.accessToken = null;
     this.tokenExpiry = null;
   }
   async getAccessToken() {
     if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
       return this.accessToken;
+    }
+
+    // Check if credentials are available
+    if (!this.clientId || !this.clientSecret) {
+      throw new Error(
+        "Spotify credentials not configured. Please set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET environment variables."
+      );
     }
 
     try {
@@ -28,7 +35,17 @@ class SpotifyAPI {
 
       return this.accessToken;
     } catch (error) {
-      throw new Error("Failed to get Spotify access token");
+      console.error("Spotify API token request failed:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        hasCredentials: !!(this.clientId && this.clientSecret),
+      });
+      throw new Error(
+        `Failed to get Spotify access token: ${
+          error.response?.data?.error_description || error.message
+        }`
+      );
     }
   }
   async getTrack(trackId, market = null) {

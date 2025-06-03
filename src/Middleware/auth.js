@@ -11,10 +11,7 @@ const auth = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "TRASHWAVE"
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "TRASHWAVE");
     const user = await User.findByPk(decoded.id);
 
     if (!user || !user.is_active) {
@@ -33,7 +30,7 @@ const auth = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (req.user.ROLE !== "admin") {
     return res.status(403).json({
       error: "Access denied. Admin role required.",
     });
@@ -42,7 +39,7 @@ const admin = (req, res, next) => {
 };
 
 const artist = (req, res, next) => {
-  if (req.user.role !== "artist" && req.user.role !== "admin") {
+  if (req.user.ROLE !== "artist") {
     return res.status(403).json({
       error: "Access denied. Artist role required.",
     });

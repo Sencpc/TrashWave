@@ -8,7 +8,6 @@ module.exports = (sequelize, DataTypes) => {
       UserLikeSong.belongsTo(models.Song, { foreignKey: "song_id" });
     }
   }
-
   UserLikeSong.init(
     {
       id: {
@@ -32,17 +31,30 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      liked_at: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {
       sequelize,
       modelName: "UserLikeSong",
       tableName: "user_like_songs",
-      timestamps: false,
+      timestamps: true,
+      paranoid: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
       indexes: [
         {
           unique: true,

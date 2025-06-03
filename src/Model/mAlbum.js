@@ -4,8 +4,14 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Album extends Model {
     static associate(models) {
-      Album.belongsTo(models.Artist, { foreignKey: "id" });
-      Album.hasMany(models.Song, { foreignKey: "id" });
+      Album.belongsTo(models.Artist, {
+        foreignKey: "artist_id",
+        as: "artist",
+      });
+      Album.hasMany(models.Song, {
+        foreignKey: "album_id",
+        as: "songs",
+      });
     }
   }
 
@@ -37,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.TEXT,
       },
-      genre:{
-        type:DataTypes.STRING(100)
+      genre: {
+        type: DataTypes.STRING(100),
       },
       total_tracks: {
         type: DataTypes.INTEGER,
@@ -52,17 +58,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: 0,
       },
-      is_explicit:{
-        type:DataTypes.BOOLEAN,
-        defaultValue: 0
+      is_explicit: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: 0,
       },
-      play_count:{
-        type:DataTypes.INTEGER,
-        defaultValue: 0
+      play_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
-      like_count:{
-        type:DataTypes.INTEGER,
-        defaultValue: 0
+      like_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       created_at: {
         type: DataTypes.DATE,

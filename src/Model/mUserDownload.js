@@ -32,13 +32,30 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      download_date: {
+      download_quality: {
+        type: DataTypes.ENUM("standard", "high", "lossless"),
+        defaultValue: "standard",
+      },
+      file_size: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+      },
+      download_completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      file_path: {
-        type: DataTypes.STRING(255),
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
         allowNull: true,
       },
     },
@@ -46,7 +63,11 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "UserDownload",
       tableName: "user_downloads",
-      timestamps: false,
+      timestamps: true,
+      paranoid: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
       name: {
         singular: "UserDownload",
         plural: "UserDownloads",
