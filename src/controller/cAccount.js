@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
-const { accountSchema } = require("../validation/schemas");
+const { accountSchema, subscribeSchema } = require("../validation/schemas");
 const { User } = require("../Model/mIndex");
 
 // Multer storage config for profile picture
@@ -270,6 +270,38 @@ const getUserByUsername = async (req, res) => {
   }
 };
 
+const subscribeUser = async (req, res) => {
+  // Validasi input dengan Joi
+  const { error, value } = subscribeSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
+    return res.status(400).json({ errors: error.details.map((e) => e.message) });
+  }
+
+  try {
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    const user = await User.findOne({ where: { api_key: apiKey } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.api_level = value.api_level;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Subscription updated",
+      api_level: user.api_level,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: "Subscription failed", details: e.message });
+  }
+};
+
 module.exports = {
   register,
   upload,
@@ -278,4 +310,5 @@ module.exports = {
   updateProfile,
   getUser,
   getUserByUsername,
+  subscribeUser,
 };

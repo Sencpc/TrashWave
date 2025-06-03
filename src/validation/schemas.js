@@ -205,6 +205,10 @@ const paymentSchema = Joi.object({
   payment_details: Joi.object().required(),
 });
 
+const subscribeSchema = Joi.object({
+  api_level: Joi.string().valid("free", "premium_lite", "premium").required(),
+});
+
 module.exports = {
   // Auth schemas
   accountSchema,
@@ -237,4 +241,5 @@ module.exports = {
   // Payment schemas
   subscriptionSchema,
   paymentSchema,
+  subscribeSchema,
 };
