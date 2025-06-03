@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      endpoint: {
+      endpoints: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
