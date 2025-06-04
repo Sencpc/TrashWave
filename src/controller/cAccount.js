@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const { accountSchema, subscribeSchema } = require("../validation/schemas");
-const { User, PaymentTransaction } = require("../Model/mIndex");
+const { User, PaymentTransaction, UserLikeSong, UserLikeAlbum, UserLikePlaylist, UserFollowArtist, Song, Album, Playlist, Artist, UserDownload } = require("../Model/mIndex");
 
 // Multer storage config for profile picture
 const storage = multer.diskStorage({
@@ -232,20 +232,136 @@ const getUser = async (req, res) => {
     const user = await User.findOne({
       where: { api_key: apiKey },
       attributes: [
+        "id",
         "username",
         "full_name",
         "date_of_birth",
         "country",
         "gender",
         "profile_picture",
+        "api_level",
       ],
     });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    return res.json(user);
+
+    // Liked Songs (beserta artist name)
+    const likedSongs = await UserLikeSong.findAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: Song,
+          as: "Song",
+          attributes: ["id", "title", "artist_id"],
+          include: [
+            {
+              model: Artist,
+              as: "artist",
+              attributes: ["id", "stage_name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Liked Albums (beserta artist name)
+    const likedAlbums = await UserLikeAlbum.findAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: Album,
+          as: "Album",
+          attributes: ["id", "title", "artist_id"],
+          include: [
+            {
+              model: Artist,
+              as: "artist",
+              attributes: ["id", "stage_name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Liked Playlists (beserta username pembuat playlist)
+    const likedPlaylists = await UserLikePlaylist.findAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: Playlist,
+          as: "Playlist",
+          attributes: ["id", "name", "user_id"],
+          include: [
+            {
+              model: User,
+              attributes: ["username"],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Followed Artists
+    const followedArtists = await UserFollowArtist.findAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: Artist,
+          as: "Artist",
+          attributes: ["id", "stage_name"],
+        },
+      ],
+    });
+
+    // Downloaded Songs (beserta artist name)
+    const downloadedSongs = await UserDownload.findAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: Song,
+          attributes: ["id", "title", "artist_id"],
+          include: [
+            {
+              model: Artist,
+              as: "artist",
+              attributes: ["id", "stage_name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    return res.json({
+      ...user.toJSON(),
+      subscription_plan: user.api_level,
+      liked_songs: likedSongs.map(l => ({
+        id: l.Song.id,
+        title: l.Song.title,
+        artist: l.Song.artist ? { id: l.Song.artist.id, name: l.Song.artist.stage_name } : null,
+      })),
+      liked_albums: likedAlbums.map(l => ({
+        id: l.Album.id,
+        title: l.Album.title,
+        artist: l.Album.artist ? { id: l.Album.artist.id, name: l.Album.artist.stage_name } : null,
+      })),
+      liked_playlists: likedPlaylists.map(l => ({
+        id: l.Playlist.id,
+        name: l.Playlist.name,
+        created_by: l.Playlist.User ? l.Playlist.User.username : null,
+      })),
+      followed_artists: followedArtists.map(f => ({
+        id: f.Artist.id,
+        name: f.Artist.stage_name,
+      })),
+      downloaded_songs: downloadedSongs.map(d => ({
+        id: d.Song.id,
+        title: d.Song.title,
+        artist: d.Song.artist ? { id: d.Song.artist.id, name: d.Song.artist.stage_name } : null,
+      })),
+    });
   } catch (e) {
-    return res.status(500).json({ error: "Failed to get user" });
+    return res.status(500).json({ error: "Failed to get user", details: e.message });
   }
 };
 

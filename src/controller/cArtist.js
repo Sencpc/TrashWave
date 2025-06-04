@@ -263,7 +263,7 @@ const registerArtist = async (req, res) => {
             phone: phone || null,
             bio: bio || null,
             gender: gender || null,
-            role: "artist",
+            ROLE: "artist",
             streaming_quota: quota.streaming_quota,
             download_quota: quota.download_quota,
             subscription_plan_id: 1,
@@ -318,7 +318,7 @@ const registerArtist = async (req, res) => {
   });
 };
 
-// PUT /artists/:id - Update artist profile (Artist/Admin only)
+// PUT /artists/:name - Update artist profile (Artist/Admin only)
 const updateArtist = async (req, res) => {
   upload.single("profile_picture")(req, res, async (err) => {
     if (err) {
@@ -326,11 +326,11 @@ const updateArtist = async (req, res) => {
     }
 
     try {
-      const { id } = req.params;
-      const { name, bio, genres, social_links } = req.body;
+      const { name } = req.params;
+      const { bio, genre, social_links } = req.body;
 
       const artist = await models.Artist.findOne({
-        where: { id, deleted_at: null },
+        where: { stage_name: name, deleted_at: null },
       });
 
       if (!artist) {
@@ -338,22 +338,20 @@ const updateArtist = async (req, res) => {
       }
 
       // Check ownership for artists
-      if (req.user.role === "artist" && req.user.id !== parseInt(id)) {
+      if (req.user.role === "artist" && req.user.id !== artist.user_id) {
         return res.status(403).json({ error: "Access denied" });
       }
 
       const updateData = {};
       if (name) updateData.name = name;
       if (bio !== undefined) updateData.bio = bio;
-      if (genres) {
-        updateData.genres =
-          typeof genres === "string" ? JSON.parse(genres) : genres;
+      if (genre) {
+        updateData.genre = Array.isArray(genre) ? genre.toString() : genre.toString();
       }
       if (social_links) {
-        updateData.social_links =
-          typeof social_links === "string"
-            ? JSON.parse(social_links)
-            : social_links;
+        updateData.social_links = typeof social_links === "object"
+          ? JSON.stringify(social_links)
+          : social_links.toString();
       }
       if (req.file) {
         updateData.profile_picture = req.file.path.replace(/\\/g, "/");
@@ -362,7 +360,8 @@ const updateArtist = async (req, res) => {
 
       await artist.update(updateData);
 
-      const updatedArtist = await models.Artist.findByPk(id, {
+      const updatedArtist = await models.Artist.findOne({
+        where: { stage_name: name, deleted_at: null },
         attributes: { exclude: ["password_hash", "api_key"] },
       });
 
@@ -380,10 +379,10 @@ const updateArtist = async (req, res) => {
 // DELETE /artists/:name - Delete artist (Admin only)
 const banArtist = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
 
     const artist = await models.Artist.findOne({
-      where: { id, deleted_at: null },
+      where: { stage_name: name, deleted_at: null },
     });
 
     if (!artist) {
@@ -524,15 +523,19 @@ const getArtistAlbums = async (req, res) => {
 // PUT /artists/:name/verify - Verify artist (Admin only)
 const verifyArtist = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body; // 'verified', 'pending', 'rejected'
+    const { name } = req.params;
+    const { status } = req.body;
 
-    if (!["verified", "pending", "rejected"].includes(status)) {
+    let validStatuses = ["pending","verified"];
+    if (!status || typeof status !== "string") {
+      return res.status(400).json({ error: "Invalid verification status" });
+    }
+    if (!validStatuses.includes(status.toLowerCase())) {
       return res.status(400).json({ error: "Invalid verification status" });
     }
 
     const artist = await models.Artist.findOne({
-      where: { id, deleted_at: null },
+      where: { stage_name: name, deleted_at: null },
     });
 
     if (!artist) {
@@ -540,7 +543,7 @@ const verifyArtist = async (req, res) => {
     }
 
     await artist.update({
-      verified: status,
+      verified: validStatuses.indexOf(status),
       updated_at: new Date(),
     });
 
@@ -549,7 +552,7 @@ const verifyArtist = async (req, res) => {
       artist: {
         id: artist.id,
         name: artist.stage_name,
-        verified: status,
+        verified: status.toLowerCase(),
       },
     });
   } catch (error) {
