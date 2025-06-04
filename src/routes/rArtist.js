@@ -17,15 +17,16 @@ const {
 } = require("../controller/cArtist");
 
 const { auth, admin, artist } = require("../Middleware/auth");
+const { authLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
 
 // Public routes
 router.get("/", getAllArtists);
 router.get("/:name", getArtistByName);
 router.get("/:name/songs", getArtistSongs);
 router.get("/:name/albums", getArtistAlbums);
-router.post("/register", registerArtist);
+router.post("/register", authLimiter, registerArtist);
 router.post("/:name/follow", auth, toggleFollowArtist);
-router.put("/:name", auth, artist, updateArtist);
+router.put("/:name", auth, artist, uploadLimiter, updateArtist);
 
 // Admin only routes
 router.delete("/:name", auth, admin, banArtist);

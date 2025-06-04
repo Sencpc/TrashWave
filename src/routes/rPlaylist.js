@@ -16,17 +16,18 @@ const {
 } = require("../controller/cPlaylist");
 
 const { auth, admin } = require("../Middleware/auth");
+const { searchLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
 
 // Public routes
 router.get("/", getAllPlaylist);
-router.get("/search/spotify", searchSpotifyPlaylists);
-router.get("/search/spotify/multiple", searchSpotifyMultiple);
+router.get("/search/spotify", searchLimiter, searchSpotifyPlaylists);
+router.get("/search/spotify/multiple", searchLimiter, searchSpotifyMultiple);
 router.get("/spotify/:playlistId", getSpotifyPlaylist);
 router.get("/:id", getPlaylistById);
 
 // Authenticated routes
-router.post("/", auth, createPlaylist);
-router.put("/:id", auth, updatePlaylist);
+router.post("/", auth, uploadLimiter, createPlaylist);
+router.put("/:id", auth, uploadLimiter, updatePlaylist);
 router.delete("/:id", auth, deletePlaylist);
 router.post("/:id/like", auth, toggleLikePlaylist);
 router.post("/:id/songs", auth, addSongToPlaylist);

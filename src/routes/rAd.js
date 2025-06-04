@@ -14,17 +14,18 @@ const {
 } = require("../controller/cAd");
 
 const { auth, admin } = require("../Middleware/auth");
+const { adLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
 
 // // Public routes
 // router.get("/", getAllAds);
 // router.get("/:id", getAdById);
 
 // User interaction routes (requires authentication)
-router.get("/watch", auth, watchAd);
+router.get("/watch", auth, adLimiter, watchAd);
 // router.post("/:id/click", clickAd);
 
 // Authenticated routes (advertisers/admin)
-router.post("/", auth, uploadMiddleware, createAd);
+router.post("/", auth, uploadLimiter, uploadMiddleware, createAd);
 // router.put("/:id", auth, uploadMiddleware, updateAd);
 // router.delete("/:id", auth, deleteAd);
 // router.get("/:id/analytics", auth, getAdAnalytics);

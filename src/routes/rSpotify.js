@@ -17,13 +17,14 @@ const {
 } = require("../controller/cSpotify");
 
 const { auth } = require("../Middleware/auth");
+const { searchLimiter } = require("../Middleware/rateLimiter");
 
 // Public Spotify endpoints (no authentication required for basic searches)
-router.get("/search", searchSpotify);
-router.get("/search/tracks", searchTracks);
-router.get("/search/albums", searchAlbums);
-router.get("/search/artists", searchArtists);
-router.get("/search/playlists", searchPlaylists);
+router.get("/search", searchLimiter, searchSpotify);
+router.get("/search/tracks", searchLimiter, searchTracks);
+router.get("/search/albums", searchLimiter, searchAlbums);
+router.get("/search/artists", searchLimiter, searchArtists);
+router.get("/search/playlists", searchLimiter, searchPlaylists);
 
 // Get specific items by ID
 router.get("/tracks/:trackId", getTrack);

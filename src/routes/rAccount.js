@@ -13,13 +13,14 @@ const {
   createAdmin,
 } = require("../controller/cAccount");
 const { auth } = require("../Middleware/auth");
+const { authLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", authLimiter, register);
+router.post("/login", authLimiter, login);
 router.get("/logout", logout);
-router.put("/profile", auth, updateProfile);
+router.put("/profile", auth, uploadLimiter, updateProfile);
 router.post("/subscribe", subscribeUser);
-router.post("/admin", createAdmin);
+router.post("/admin", authLimiter, createAdmin);
 
 // Tambahan endpoint:
 router.get("/user", getUser); // GET user by API key (header: x-api-key)

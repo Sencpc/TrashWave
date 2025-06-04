@@ -22,9 +22,9 @@ A comprehensive music streaming platform backend with user authentication, role-
 
 ## 📋 Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v16.14.2 or higher, below v17.0.0)
 - MySQL (v8.0 or higher)
-- npm or yarn package manager
+- npm (v8.5.0 or higher)
 
 ## 🛠️ Installation
 
@@ -120,6 +120,10 @@ Authorization: Bearer <your_jwt_token>
 TrashWave/
 ├── src/
 │   ├── config/          # Configuration files (database, environment)
+│   │   ├── db.js        # Database connection configuration
+│   │   └── env.js       # Environment variable configuration
+│   ├── connection/      # Database connection management
+│   │   └── conn.js      # Database connection handlers
 │   ├── controller/      # Request handlers for all endpoints
 │   │   ├── cAccount.js  # Account management (register, login, profile)
 │   │   ├── cSong.js     # Song operations (CRUD, play, download, Spotify)
@@ -128,22 +132,34 @@ TrashWave/
 │   │   ├── cPlaylist.js # Playlist operations (CRUD, song management)
 │   │   ├── cUser.js     # User profile and relationship management
 │   │   ├── cAdmin.js    # Admin dashboard and management functions
-│   │   ├── cSubscription.js # Subscription and payment handling
 │   │   ├── cAd.js       # Advertisement management and analytics
 │   │   ├── cSpotify.js  # Spotify API integration
 │   │   └── cDocs.js     # API documentation controller
-│   ├── middleware/      # Custom middleware functions
+│   ├── db/             # Database utilities
+│   │   └── sync.js      # Database synchronization utilities
+│   ├── Middleware/      # Custom middleware functions (Note: Capital M)
 │   │   ├── auth.js      # JWT authentication and role authorization
-│   │   └── rateLimiter.js # API rate limiting configuration
+│   │   ├── rateLimiter.js # API rate limiting configuration
+│   │   └── validation.js # Request validation middleware
 │   ├── Model/          # Sequelize database models
 │   │   ├── mAccount.js  # User account model
 │   │   ├── mSong.js     # Song model with associations
 │   │   ├── mArtist.js   # Artist model with user relationship
 │   │   ├── mAlbum.js    # Album model with song relationships
+│   │   ├── mAlbumSong.js # Album-Song relationship mapping
 │   │   ├── mPlaylist.js # Playlist model with song relationships
+│   │   ├── mPlaylistSong.js # Playlist-Song relationship mapping
 │   │   ├── mUserDownload.js # Download tracking model
 │   │   ├── mUserLikeSong.js # User-song like relationships
+│   │   ├── mUserLikeAlbum.js # User-album like relationships
+│   │   ├── mUserLikePlaylist.js # User-playlist like relationships
+│   │   ├── mUserFollowArtist.js # User-artist follow relationships
 │   │   ├── mAd.js       # Advertisement model
+│   │   ├── mAdView.js   # Advertisement view tracking
+│   │   ├── mApiLog.js   # API usage logging
+│   │   ├── mApiTierlist.js # API tier management
+│   │   ├── mPaymentTransaction.js # Payment transaction tracking
+│   │   ├── mSubscriptionPlan.js # Subscription plan definitions
 │   │   └── mIndex.js    # Model registry and associations
 │   ├── routes/         # API route definitions
 │   │   ├── rAccount.js  # Account routes (/api/v1/account)
@@ -157,18 +173,30 @@ TrashWave/
 │   │   ├── rAd.js       # Ad routes (/api/v1/ads)
 │   │   └── rSpotify.js  # Spotify routes (/api/v1/spotify)
 │   ├── utils/          # Utility functions and helpers
+│   │   ├── auth.js      # Authentication utility functions
 │   │   ├── spotifyAPI.js # Spotify Web API integration
 │   │   └── logger.js    # Request logging utilities
-│   └── validation/     # Input validation schemas (Joi)
+│   └── validation/     # Input validation schemas
+│       └── schemas.js   # Joi validation schemas
 ├── storage/            # File uploads (auto-created)
 │   ├── songs/          # Audio file storage
+│   │   ├── audio/      # Song audio files (.mp3, .wav, .flac, .m4a)
+│   │   └── covers/     # Song cover images
 │   ├── albums/         # Album cover images
+│   ├── artists/        # Artist profile images
 │   ├── playlists/      # Playlist cover images
 │   ├── ads/            # Advertisement media files
-│   └── {username}/     # User profile pictures
+│   │   ├── audio/      # Audio advertisements
+│   │   ├── image/      # Image advertisements
+│   │   └── video/      # Video advertisements
+│   └── users/          # User profile pictures
+├── logs/               # Application logs
+│   └── access.log      # Access logs
 ├── db_trashwave.sql   # Complete database schema with test data
 ├── .env              # Environment variables (create from template)
-├── index.js          # Main application entry point
+├── index.js          # Main application entry point with database
+├── index-no-db.js    # Application entry point without database
+├── setup.js          # Initial setup and database seeding script
 └── package.json      # Dependencies and scripts
 ```
 
@@ -389,11 +417,11 @@ TrashWave/
 
 ## 💳 Subscription Plans & Quotas
 
-| Plan             | Price | Monthly Features                                                                         |
-| ---------------- | ----- | ---------------------------------------------------------------------------------------- |
-| **Free**         | $0    | 5 downloads/day • 3 playlists • Limited streaming quota • Ads enabled • Standard quality |
-| **Premium Lite** | $4.99 | 50 downloads/day • 20 playlists • Increased streaming quota • Ad-free • High quality     |
-| **Premium**      | $9.99 | Unlimited downloads • Unlimited playlists • Unlimited streaming • Ad-free • Lossless     |
+| Plan             | Price | Monthly Features                                                                             |
+| ---------------- | ----- | -------------------------------------------------------------------------------------------- |
+| **Free**         | $0    | 5 downloads/day • 3 playlists • Limited streaming quota • Ads enabled • Standard quality     |
+| **Premium Lite** | $5.90 | 25 downloads/day • 20 playlists • 500 streaming quota • Ad-free • High quality               |
+| **Premium**      | $9.90 | Unlimited downloads • Unlimited playlists • Unlimited streaming • Ad-free • Lossless quality |
 
 ### Quota Management System
 
@@ -424,13 +452,64 @@ TrashWave/
 
 ### API Rate Limiting (Per IP Address)
 
-| Endpoint Category     | Limit        | Window     |
-| --------------------- | ------------ | ---------- |
-| **General API**       | 100 requests | 15 minutes |
-| **Authentication**    | 5 requests   | 15 minutes |
-| **File Uploads**      | 20 requests  | 1 hour     |
-| **Search Operations** | 30 requests  | 1 minute   |
-| **Ad Interactions**   | 10 requests  | 1 minute   |
+The TrashWave API implements comprehensive rate limiting to prevent abuse and ensure fair usage across all endpoints. Rate limiters are applied before authentication middleware for optimal performance.
+
+| Rate Limiter          | Limit        | Window     | Applied To                                  |
+| --------------------- | ------------ | ---------- | ------------------------------------------- |
+| **General API**       | 100 requests | 15 minutes | All `/api/` routes (global protection)      |
+| **Authentication**    | 5 requests   | 15 minutes | Login, register, admin creation endpoints   |
+| **File Uploads**      | 20 requests  | 1 hour     | Song, album, playlist, profile uploads      |
+| **Search Operations** | 30 requests  | 1 minute   | Spotify API searches and track lookups      |
+| **Ad Interactions**   | 10 requests  | 1 minute   | Advertisement view/click tracking endpoints |
+
+### Rate Limiter Implementation by Route
+
+#### 🔐 Authentication Routes
+
+- `POST /api/v1/account/register` → `authLimiter` (prevents registration spam)
+- `POST /api/v1/account/login` → `authLimiter` (prevents brute force attacks)
+- `POST /api/v1/account/admin` → `authLimiter` (protects admin creation)
+- `POST /api/v1/artists/register` → `authLimiter` (prevents artist registration abuse)
+
+#### 📁 File Upload Routes
+
+- `POST /api/v1/songs` → `uploadLimiter` (audio + cover uploads)
+- `PUT /api/v1/songs/:id` → `uploadLimiter` (audio + cover updates)
+- `POST /api/v1/albums` → `uploadLimiter` (cover image uploads)
+- `PUT /api/v1/albums/:id` → `uploadLimiter` (cover image updates)
+- `POST /api/v1/playlists` → `uploadLimiter` (cover image uploads)
+- `PUT /api/v1/playlists/:id` → `uploadLimiter` (cover image updates)
+- `PUT /api/v1/account/profile` → `uploadLimiter` (profile image uploads)
+- `PUT /api/v1/artists/:name` → `uploadLimiter` (artist profile uploads)
+- `POST /api/v1/ads` → `uploadLimiter` (advertisement media uploads)
+
+#### 🔍 Search & Spotify Routes
+
+- `GET /api/v1/songs/search/spotify` → `searchLimiter` (Spotify song search)
+- `GET /api/v1/albums/search/spotify` → `searchLimiter` (Spotify album search)
+- `GET /api/v1/playlists/search/spotify` → `searchLimiter` (Spotify playlist search)
+- `GET /api/v1/spotify/search/*` → `searchLimiter` (all Spotify API endpoints)
+
+#### 📺 Advertisement Routes
+
+- `GET /api/v1/ads/watch` → `adLimiter` (prevents ad view manipulation)
+
+### Rate Limit Response Format
+
+When rate limits are exceeded, the API returns:
+
+```json
+{
+  "success": false,
+  "message": "Too many requests, please try again later."
+}
+```
+
+### Middleware Components
+
+- **`auth.js`**: JWT verification and role-based authorization middleware
+- **`rateLimiter.js`**: Comprehensive rate limiting with 5 different limiter types
+- **`validation.js`**: Request validation using Joi schemas for input sanitization
 
 ### Security Features
 
@@ -439,6 +518,12 @@ TrashWave/
 - **File Upload Security**: Type validation, size limits, and secure storage
 - **SQL Injection Protection**: Sequelize ORM with parameterized queries
 - **CORS Configuration**: Configurable cross-origin resource sharing
+- **Rate Limiting**: Multi-tiered protection against various types of abuse:
+  - **Brute Force Protection**: `authLimiter` prevents password attacks
+  - **Resource Protection**: `uploadLimiter` prevents storage abuse
+  - **API Abuse Prevention**: `searchLimiter` protects expensive operations
+  - **Ad Fraud Prevention**: `adLimiter` prevents click/view manipulation
+  - **General Protection**: `apiLimiter` provides baseline API protection
 
 ## 🧪 Testing & Development
 
@@ -499,7 +584,7 @@ npm run db:drop
 
 - **Supported Formats**: MP3, WAV, FLAC, M4A
 - **Maximum Size**: 50MB per file
-- **Storage Location**: `storage/songs/`
+- **Storage Location**: `storage/songs/audio/` (with audio files) and `storage/songs/covers/` (for cover images)
 - **Quality Requirements**: Minimum 128kbps for MP3, lossless for FLAC
 - **Metadata Support**: Artist, album, genre, duration auto-extraction
 
@@ -508,10 +593,12 @@ npm run db:drop
 - **Supported Formats**: JPEG, JPG, PNG
 - **Maximum Size**: 5MB per file
 - **Storage Locations**:
-  - Profile pictures: `storage/{username}/profile.{ext}`
-  - Album covers: `storage/albums/cover/`
-  - Playlist covers: `storage/playlists/cover/`
-  - Ad media: `storage/ads/image/` and `storage/ads/video/`
+  - Profile pictures: `storage/users/` and `storage/{username}/`
+  - Album covers: `storage/albums/`
+  - Playlist covers: `storage/playlists/`
+  - Artist images: `storage/artists/`
+  - Song covers: `storage/songs/covers/`
+  - Ad media: `storage/ads/image/`, `storage/ads/audio/`, and `storage/ads/video/`
 
 ## 🌐 Spotify Integration Features
 
@@ -941,24 +1028,34 @@ df -h storage/  # Monitor storage directory size
 ```json
 {
   "runtime": {
-    "node": ">=14.0.0",
+    "node": ">=16.14.2 <17.0.0",
+    "npm": ">=8.5.0",
     "mysql": ">=8.0.0"
   },
   "core": {
-    "express": "^5.1.0",
-    "sequelize": "^6.37.7",
-    "mysql2": "^3.14.1"
+    "express": "^4.18.2",
+    "sequelize": "^6.28.0",
+    "mysql2": "^2.3.3"
   },
   "authentication": {
-    "jsonwebtoken": "^9.0.2",
-    "bcrypt": "^6.0.0"
+    "jsonwebtoken": "^9.0.0",
+    "bcrypt": "^5.1.0"
   },
   "integrations": {
-    "axios": "^1.9.0",
-    "multer": "^1.4.5-lts.2"
+    "axios": "^0.27.2",
+    "multer": "^1.4.4"
   },
   "validation": {
-    "joi": "^17.13.3"
+    "joi": "^17.7.0",
+    "@joi/date": "^2.1.0"
+  },
+  "middleware": {
+    "cors": "^2.8.5",
+    "express-rate-limit": "^6.7.0",
+    "dotenv": "^16.0.3"
+  },
+  "development": {
+    "nodemon": "^2.0.20"
   }
 }
 ```

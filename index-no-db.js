@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const config = require("./src/config/env");
-const { apiLimiter } = require("./src/middleware/rateLimiter");
+const { apiLimiter } = require("./src/Middleware/rateLimiter");
 const { requestLogger } = require("./src/utils/logger");
 
 const app = express();
