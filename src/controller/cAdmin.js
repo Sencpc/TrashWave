@@ -9,7 +9,7 @@ const {
   ApiLog,
 } = require("../Model/mIndex");
 const { Op } = require("sequelize");
-const SpotifyAPI = require("../utils/SpotifyAPI");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // GET /admin/dashboard - Get admin dashboard statistics
 const getDashboardStats = async (req, res) => {
