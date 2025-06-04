@@ -6,7 +6,19 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const { accountSchema, subscribeSchema } = require("../validation/schemas");
-const { User, PaymentTransaction, UserLikeSong, UserLikeAlbum, UserLikePlaylist, UserFollowArtist, Song, Album, Playlist, Artist, UserDownload } = require("../Model/mIndex");
+const {
+  User,
+  PaymentTransaction,
+  UserLikeSong,
+  UserLikeAlbum,
+  UserLikePlaylist,
+  UserFollowArtist,
+  Song,
+  Album,
+  Playlist,
+  Artist,
+  UserDownload,
+} = require("../Model/mIndex");
 
 // Multer storage config for profile picture
 const storage = multer.diskStorage({
@@ -177,29 +189,33 @@ const updateProfile = async (req, res) => {
       return res.status(401).json({ error: "Invalid API key" });
     }
 
-    // Validate input (reuse accountSchema but make all fields optional)
-    const updateSchema = accountSchema.fork(
-      ["username", "email", "confirm_password", "password"],
-      (schema) => schema.optional()
-    );
-    const { error, value = {} } = updateSchema.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res
-        .status(400)
-        .json({ errors: error.details.map((e) => e.message) });
-    }
+    // Get validated data from middleware
+    const {
+      full_name,
+      date_of_birth,
+      country,
+      gender,
+      username,
+      email,
+      password,
+      phone,
+      bio,
+    } = req.body;
 
     // Prepare update data
     const updateData = {};
-    if (value.full_name) updateData.full_name = value.full_name;
-    if (value.date_of_birth) updateData.date_of_birth = value.date_of_birth;
-    if (value.country) updateData.country = value.country;
+    if (full_name) updateData.full_name = full_name;
+    if (date_of_birth) updateData.date_of_birth = date_of_birth;
+    if (country) updateData.country = country;
+    if (gender) updateData.gender = gender;
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
+    if (bio) updateData.bio = bio;
 
     // Handle password update
-    if (value.password) {
-      updateData.password_hash = await bcrypt.hash(value.password, 10);
+    if (password) {
+      updateData.password_hash = await bcrypt.hash(password, 10);
     }
 
     // Handle profile picture update
@@ -335,33 +351,41 @@ const getUser = async (req, res) => {
     return res.json({
       ...user.toJSON(),
       subscription_plan: user.api_level,
-      liked_songs: likedSongs.map(l => ({
+      liked_songs: likedSongs.map((l) => ({
         id: l.Song.id,
         title: l.Song.title,
-        artist: l.Song.artist ? { id: l.Song.artist.id, name: l.Song.artist.stage_name } : null,
+        artist: l.Song.artist
+          ? { id: l.Song.artist.id, name: l.Song.artist.stage_name }
+          : null,
       })),
-      liked_albums: likedAlbums.map(l => ({
+      liked_albums: likedAlbums.map((l) => ({
         id: l.Album.id,
         title: l.Album.title,
-        artist: l.Album.artist ? { id: l.Album.artist.id, name: l.Album.artist.stage_name } : null,
+        artist: l.Album.artist
+          ? { id: l.Album.artist.id, name: l.Album.artist.stage_name }
+          : null,
       })),
-      liked_playlists: likedPlaylists.map(l => ({
+      liked_playlists: likedPlaylists.map((l) => ({
         id: l.Playlist.id,
         name: l.Playlist.name,
         created_by: l.Playlist.User ? l.Playlist.User.username : null,
       })),
-      followed_artists: followedArtists.map(f => ({
+      followed_artists: followedArtists.map((f) => ({
         id: f.Artist.id,
         name: f.Artist.stage_name,
       })),
-      downloaded_songs: downloadedSongs.map(d => ({
+      downloaded_songs: downloadedSongs.map((d) => ({
         id: d.Song.id,
         title: d.Song.title,
-        artist: d.Song.artist ? { id: d.Song.artist.id, name: d.Song.artist.stage_name } : null,
+        artist: d.Song.artist
+          ? { id: d.Song.artist.id, name: d.Song.artist.stage_name }
+          : null,
       })),
     });
   } catch (e) {
-    return res.status(500).json({ error: "Failed to get user", details: e.message });
+    return res
+      .status(500)
+      .json({ error: "Failed to get user", details: e.message });
   }
 };
 
@@ -390,12 +414,8 @@ const getUserByUsername = async (req, res) => {
 };
 
 const subscribeUser = async (req, res) => {
-  const { error, value } = subscribeSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res.status(400).json({ errors: error.details.map((e) => e.message) });
-  }
-
   try {
+    const { api_level } = req.body;
     const apiKey = req.headers["x-api-key"];
     if (!apiKey) {
       return res.status(401).json({ error: "API key required" });
@@ -408,13 +428,13 @@ const subscribeUser = async (req, res) => {
 
     // Simulasi harga dan plan (bisa diambil dari SubscriptionPlan jika ingin)
     let amount = 0;
-    let planName = value.api_level;
-    if (value.api_level === "premium") amount = 50000;
-    else if (value.api_level === "premium_lite") amount = 25000;
+    let planName = api_level;
+    if (api_level === "premium") amount = 50000;
+    else if (api_level === "premium_lite") amount = 25000;
 
     // Update api_level dan kuota user
-    const quota = getQuotaByApiLevel(value.api_level);
-    user.api_level = value.api_level;
+    const quota = getQuotaByApiLevel(api_level);
+    user.api_level = api_level;
     user.streaming_quota = quota.streaming_quota;
     user.download_quota = quota.download_quota;
     await user.save();
@@ -434,7 +454,7 @@ const subscribeUser = async (req, res) => {
       expires_at: null,
       failure_reason: null,
       metadata: {
-        api_level: value.api_level,
+        api_level: api_level,
       },
     });
 
@@ -451,7 +471,9 @@ const subscribeUser = async (req, res) => {
       },
     });
   } catch (e) {
-    return res.status(500).json({ error: "Subscription failed", details: e.message });
+    return res
+      .status(500)
+      .json({ error: "Subscription failed", details: e.message });
   }
 };
 
@@ -479,24 +501,29 @@ const getUserQuota = async (req, res) => {
 };
 
 const createAdmin = async (req, res) => {
-  // Validasi input, gunakan accountSchema tapi ROLE di-set "admin"
-  const { error, value } = accountSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res.status(400).json({ errors: error.details.map(e => e.message) });
-  }
-
   try {
+    const {
+      username,
+      email,
+      password,
+      full_name,
+      date_of_birth,
+      country,
+      gender,
+    } = req.body;
     // Cek username/email sudah ada
     const exists = await User.findOne({
       where: {
-        [Op.or]: [{ username: value.username }, { email: value.email }],
+        [Op.or]: [{ username: username }, { email: email }],
       },
     });
     if (exists) {
-      return res.status(409).json({ error: "Username or email already exists" });
+      return res
+        .status(409)
+        .json({ error: "Username or email already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(value.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate API key
     const apiKey = crypto.randomUUID();
@@ -505,14 +532,14 @@ const createAdmin = async (req, res) => {
     const quota = { streaming_quota: -1, download_quota: -1 };
 
     const user = await User.create({
-      username: value.username,
-      email: value.email,
+      username: username,
+      email: email,
       password_hash: hashedPassword,
-      full_name: value.full_name,
+      full_name: full_name,
       profile_picture: null,
-      date_of_birth: value.date_of_birth,
-      country: value.country,
-      gender: value.gender,
+      date_of_birth: date_of_birth,
+      country: country,
+      gender: gender,
       ROLE: "admin",
       streaming_quota: quota.streaming_quota,
       download_quota: quota.download_quota,
@@ -526,7 +553,9 @@ const createAdmin = async (req, res) => {
 
     return res.status(201).json({ message: "Admin account created", user });
   } catch (e) {
-    return res.status(500).json({ error: "Admin registration failed", details: e.message });
+    return res
+      .status(500)
+      .json({ error: "Admin registration failed", details: e.message });
   }
 };
 

@@ -51,7 +51,10 @@ const accountSchema = Joi.object({
     }),
 
   country: Joi.string().max(50).label("Country").allow(null, ""),
-  gender: Joi.string().valid("male", "female", "other").required().label("Gender"),
+  gender: Joi.string()
+    .valid("male", "female", "other")
+    .required()
+    .label("Gender"),
 });
 
 const registerSchema = Joi.object({
@@ -71,13 +74,16 @@ const loginSchema = Joi.object({
 });
 
 const updateProfileSchema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).optional(),
+  username: Joi.string().min(1).max(100).optional(),
   email: Joi.string().email().optional(),
+  full_name: Joi.string().min(1).max(100).optional(),
+  date_of_birth: Joi.date().greater("1970-01-01").less("now").iso().optional(),
+  country: Joi.string().max(50).optional().allow(null, ""),
+  gender: Joi.string().valid("male", "female", "other").optional(),
+  password: Joi.string().min(6).optional(),
   phone: Joi.string()
     .pattern(/^[0-9+\-\s]+$/)
     .optional(),
-  birth_date: Joi.date().max("now").optional(),
-  gender: Joi.string().valid("male", "female", "other").optional(),
   bio: Joi.string().max(500).optional(),
 });
 
@@ -99,22 +105,28 @@ const updateArtistSchema = Joi.object({
 const registerArtistSchema = Joi.object({
   username: Joi.string().min(3).max(30).required(),
   name: Joi.string().min(2).max(100).required(),
-  real_name: Joi.string().min(2).max(100).optional().allow(null, ''),
+  real_name: Joi.string().min(2).max(100).optional().allow(null, ""),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  dob: Joi.date().iso().optional().allow(null, ''),
-  country: Joi.string().max(100).optional().allow(null, ''),
-  phone: Joi.string().pattern(/^[0-9+\-\s]+$/).optional().allow(null, ''),
-  bio: Joi.string().max(1000).optional().allow(null, ''),
-  gender: Joi.string().valid("male", "female", "other").optional().allow(null, ''),
-  genres: Joi.alternatives().try(
-    Joi.array().items(Joi.string().max(100)),
-    Joi.string()
-  ).optional().allow(null, ''),
-  social_links: Joi.alternatives().try(
-    Joi.object(),
-    Joi.string()
-  ).optional().allow(null, ''),
+  dob: Joi.date().iso().optional().allow(null, ""),
+  country: Joi.string().max(100).optional().allow(null, ""),
+  phone: Joi.string()
+    .pattern(/^[0-9+\-\s]+$/)
+    .optional()
+    .allow(null, ""),
+  bio: Joi.string().max(1000).optional().allow(null, ""),
+  gender: Joi.string()
+    .valid("male", "female", "other")
+    .optional()
+    .allow(null, ""),
+  genres: Joi.alternatives()
+    .try(Joi.array().items(Joi.string().max(100)), Joi.string())
+    .optional()
+    .allow(null, ""),
+  social_links: Joi.alternatives()
+    .try(Joi.object(), Joi.string())
+    .optional()
+    .allow(null, ""),
 });
 
 // Song validation schemas
@@ -171,12 +183,13 @@ const updatePlaylistSchema = Joi.object({
 });
 
 const addSongToPlaylistSchema = Joi.object({
-  song_id: Joi.number().integer().required(),
+  song_name: Joi.string().required(),
+  postition: Joi.number().integer().min(1).optional(),
 });
 
 // Search and filter schemas
 const searchSchema = Joi.object({
-  q: Joi.string().min(1).max(100).required(),
+  query: Joi.string().min(1).max(100).required(),
   type: Joi.string()
     .valid("song", "artist", "album", "playlist", "all")
     .optional(),
@@ -220,6 +233,92 @@ const subscribeSchema = Joi.object({
   api_level: Joi.string().valid("free", "premium_lite", "premium").required(),
 });
 
+// Ad validation schemas
+const createAdSchema = Joi.object({
+  title: Joi.string().min(1).max(200).required(),
+  description: Joi.string().max(1000).optional(),
+  type: Joi.string().valid("audio", "video", "image").required(),
+  target_audience: Joi.object().optional(),
+  budget: Joi.number().precision(2).min(0).optional(),
+  duration: Joi.number().integer().min(1).optional(),
+  click_url: Joi.string().uri().optional(),
+});
+
+const updateAdSchema = Joi.object({
+  title: Joi.string().min(1).max(200).optional(),
+  description: Joi.string().max(1000).optional(),
+  type: Joi.string().valid("audio", "video", "image").optional(),
+  target_audience: Joi.object().optional(),
+  budget: Joi.number().precision(2).min(0).optional(),
+  duration: Joi.number().integer().min(1).optional(),
+  click_url: Joi.string().uri().optional(),
+});
+
+// Admin validation schemas
+const createSubscriptionPlanSchema = Joi.object({
+  name: Joi.string().min(1).max(100).required(),
+  description: Joi.string().max(500).optional(),
+  price: Joi.number().precision(2).min(0).required(),
+  duration_days: Joi.number().integer().min(1).required(),
+  features: Joi.object().required(),
+  is_active: Joi.boolean().optional(),
+});
+
+const updateSubscriptionPlanSchema = Joi.object({
+  name: Joi.string().min(1).max(100).optional(),
+  description: Joi.string().max(500).optional(),
+  price: Joi.number().precision(2).min(0).optional(),
+  duration_days: Joi.number().integer().min(1).optional(),
+  features: Joi.object().optional(),
+  is_active: Joi.boolean().optional(),
+});
+
+const createAdminSchema = Joi.object({
+  username: Joi.string().min(1).max(100).required().label("Username").messages({
+    "any.required": "{{#label}} is required",
+    "string.min": "{{#label}} must be at least 1 character long",
+    "string.max": "{{#label}} must not exceed 100 characters",
+  }),
+  email: Joi.string()
+    .email({ tlds: { allow: ["com"] } })
+    .required()
+    .label("Email")
+    .messages({
+      "any.required": "{{#label}} is required",
+      "string.email": "{{#label}} must be a valid email address",
+    }),
+  password: Joi.string().min(6).required().label("Password").messages({
+    "string.min": "{{#label}} must be at least 6 characters long",
+    "any.required": "{{#label}} is required",
+  }),
+  full_name: Joi.string()
+    .min(1)
+    .max(100)
+    .required()
+    .label("Full Name")
+    .messages({
+      "any.required": "{{#label}} is required",
+      "string.min": "{{#label}} must be at least 1 character long",
+      "string.max": "{{#label}} must not exceed 100 characters",
+    }),
+  date_of_birth: Joi.date()
+    .greater("1970-01-01")
+    .less("now")
+    .iso()
+    .optional()
+    .label("Date of Birth")
+    .messages({
+      "date.greater": "{{#label}} must be after 1970-01-01",
+      "date.less": "{{#label}} must be before today",
+      "date.format": "{{#label}} must be in ISO format (YYYY-MM-DD)",
+    }),
+  country: Joi.string().max(100).optional().label("Country"),
+  gender: Joi.string()
+    .valid("male", "female", "other")
+    .optional()
+    .label("Gender"),
+});
+
 module.exports = {
   // Auth schemas
   accountSchema,
@@ -248,9 +347,15 @@ module.exports = {
   // Search and pagination
   searchSchema,
   paginationSchema,
-
   // Payment schemas
   subscriptionSchema,
   paymentSchema,
   subscribeSchema,
+  // Ad schemas
+  createAdSchema,
+  updateAdSchema,
+  // Admin schemas
+  createAdminSchema,
+  createSubscriptionPlanSchema,
+  updateSubscriptionPlanSchema,
 };

@@ -18,14 +18,30 @@ const {
 
 const { auth, admin, artist } = require("../Middleware/auth");
 const { searchLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
+const {
+  validateBody,
+  validateQuery,
+  validateParams,
+} = require("../Middleware/validation");
+const {
+  createAlbumSchema,
+  updateAlbumSchema,
+  searchSchema,
+  paginationSchema,
+} = require("../validation/schemas");
 
 // Public routes
-router.get("/", getAllAlbums);
-router.get("/search/spotify", searchLimiter, searchSpotifyAlbums);
+router.get("/", validateQuery(paginationSchema), getAllAlbums);
+router.get(
+  "/search/spotify",
+  searchLimiter,
+  validateQuery(searchSchema),
+  searchSpotifyAlbums
+);
 router.get("/spotify/:albumId", getSpotifyAlbum);
 router.get("/spotify/albums/:albumIds", getSpotifyAlbums);
 router.get("/:id", getAlbumById);
-router.get("/:id/songs", getAlbumSongs);
+router.get("/:id/songs", validateQuery(paginationSchema), getAlbumSongs);
 
 // Authenticated routes
 router.post("/:id/like", auth, toggleLikeAlbum);

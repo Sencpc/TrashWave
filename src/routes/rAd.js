@@ -15,6 +15,12 @@ const {
 
 const { auth, admin } = require("../Middleware/auth");
 const { adLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
+const { validateBody, validateQuery } = require("../Middleware/validation");
+const {
+  createAdSchema,
+  updateAdSchema,
+  paginationSchema,
+} = require("../validation/schemas");
 
 // // Public routes
 // router.get("/", getAllAds);

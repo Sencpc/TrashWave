@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require("path");
 const { Ad, AdView, User } = require("../Model/mIndex");
 const { Op, Sequelize } = require("sequelize");
-const { sequelize } = require("../config/db");
 
 // Multer storage config for ad media files
 const storage = multer.diskStorage({
@@ -25,19 +24,20 @@ const upload = multer({
   limits: {
     fileSize: 50 * 1024 * 1024, // 50MB limit
   },
-  fileFilter: (req, file, cb) => {    const allowedTypes = {
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = {
       image: {
         extensions: /\.(jpeg|jpg|png|gif)$/i,
-        mimeTypes: /^image\/(jpeg|png|gif)$/
+        mimeTypes: /^image\/(jpeg|png|gif)$/,
       },
       video: {
         extensions: /\.(mp4|avi|mov|wmv)$/i,
-        mimeTypes: /^video\/(mp4|x-msvideo|quicktime|x-ms-wmv)$/
+        mimeTypes: /^video\/(mp4|x-msvideo|quicktime|x-ms-wmv)$/,
       },
       audio: {
         extensions: /\.(mp3|wav|flac|m4a)$/i,
-        mimeTypes: /^audio\/(mpeg|mp3|wav|flac|x-m4a)$/
-      }
+        mimeTypes: /^audio\/(mpeg|mp3|wav|flac|x-m4a)$/,
+      },
     };
 
     const fieldType =
@@ -51,11 +51,11 @@ const upload = multer({
     const ext = path.extname(file.originalname).toLowerCase();
     const mime = file.mimetype;
 
-    console.log('File upload attempt:', {
+    console.log("File upload attempt:", {
       fieldType,
       filename: file.originalname,
       extension: ext,
-      mimeType: mime
+      mimeType: mime,
     });
 
     if (allowed.extensions.test(ext) && allowed.mimeTypes.test(mime)) {
@@ -74,7 +74,8 @@ const uploadMiddleware = upload.fields([
 
 // Create new ad (admin/advertiser only)
 const createAd = async (req, res) => {
-  try {    const {
+  try {
+    const {
       title,
       description,
       target_url,
@@ -129,8 +130,8 @@ const watchAd = async (req, res) => {
   try {
     // Check if user is free tier and has 0 streaming quota
     const user = await User.findByPk(req.user.id);
-    
-    if (user.api_level !== 'free') {
+
+    if (user.api_level !== "free") {
       return res.status(403).json({
         success: false,
         message: "Only free tier users can watch ads",
@@ -140,18 +141,19 @@ const watchAd = async (req, res) => {
     if (user.streaming_quota > 0) {
       return res.status(400).json({
         success: false,
-        message: "You still have streaming quota available. No need to watch ads.",
-        streaming_quota: user.streaming_quota
+        message:
+          "You still have streaming quota available. No need to watch ads.",
+        streaming_quota: user.streaming_quota,
       });
-    }    // Get a random active ad
+    } // Get a random active ad
     const ad = await Ad.findOne({
       where: {
         is_active: true,
         end_date: {
-          [Op.gt]: new Date() // Only get ads that haven't expired
-        }
+          [Op.gt]: new Date(), // Only get ads that haven't expired
+        },
       },
-      order: Sequelize.literal('RAND()') // Get random ad using MySQL RAND() function
+      order: Sequelize.literal("RAND()"), // Get random ad using MySQL RAND() function
     });
 
     if (!ad) {
@@ -165,23 +167,23 @@ const watchAd = async (req, res) => {
     await AdView.create({
       ad_id: ad.id,
       user_id: req.user ? req.user.id : null,
-      view_type: 'impression',
+      view_type: "impression",
       ip_address: req.ip || req.connection.remoteAddress,
       user_agent: req.get("User-Agent"),
-    });    // Update view count
+    }); // Update view count
     await ad.increment("total_views");
 
     // Add streaming quota to user
     const quotaToAward = ad.total_getSQ || 1;
-    await user.increment('streaming_quota', { by: quotaToAward });
-    
+    await user.increment("streaming_quota", { by: quotaToAward });
+
     // Get updated user data
     const updatedUser = await User.findByPk(req.user.id);
 
     res.json({
       target_url: ad.target_url,
       streaming_quota_awarded: quotaToAward,
-      current_streaming_quota: updatedUser.streaming_quota
+      current_streaming_quota: updatedUser.streaming_quota,
     });
   } catch (error) {
     console.error("Error getting ad:", error);
@@ -190,7 +192,6 @@ const watchAd = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   uploadMiddleware,

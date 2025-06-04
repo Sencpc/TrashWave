@@ -18,8 +18,37 @@ const validate = (schema, property = "body") => {
       });
     }
 
-    // Replace the request property with the validated and sanitized value
     req[property] = value;
+    next();
+  };
+};
+
+// Special validation for multipart/form-data (file uploads)
+const validateMultipart = (schema) => {
+  return (req, res, next) => {
+    // For multipart requests, the text fields are in req.body
+    // Files are handled separately by multer middleware
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+      allowUnknown: true, // Allow file fields that aren't in the schema
+    });
+
+    if (error) {
+      const errors = error.details.map((detail) => ({
+        field: detail.path.join("."),
+        message: detail.message,
+      }));
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors,
+      });
+    }
+
+    // Update req.body with validated and sanitized data
+    req.body = { ...req.body, ...value };
     next();
   };
 };
@@ -33,4 +62,5 @@ module.exports = {
   validateQuery,
   validateParams,
   validateBody,
+  validateMultipart,
 };

@@ -47,21 +47,8 @@ const artist = (req, res, next) => {
   next();
 };
 
-const checkOwnership = (req, res, next) => {
-  const userId = req.params.userId || req.params.id;
-
-  if (req.user.role === "admin" || req.user.id == userId) {
-    return next();
-  }
-
-  return res.status(403).json({
-    error: "Access denied. You can only access your own resources.",
-  });
-};
-
 module.exports = {
   auth,
   admin,
   artist,
-  checkOwnership,
 };

@@ -4,6 +4,12 @@ const SubscriptionPlan = require("../Model/mSubscriptionPlan");
 const PaymentTransaction = require("../Model/mPaymentTransaction");
 const User = require("../Model/mAccount");
 const { auth } = require("../Middleware/auth");
+const { validateBody, validateQuery } = require("../Middleware/validation");
+const {
+  subscriptionSchema,
+  paymentSchema,
+  paginationSchema,
+} = require("../validation/schemas");
 
 // GET /subscriptions/plans - Get all subscription plans
 const getSubscriptionPlans = async (req, res) => {
@@ -150,8 +156,13 @@ const getTransactionHistory = async (req, res) => {
 
 // Routes
 router.get("/plans", getSubscriptionPlans);
-router.post("/subscribe", auth, subscribe);
+router.post("/subscribe", auth, validateBody(subscriptionSchema), subscribe);
 router.get("/current", auth, getCurrentSubscription);
-router.get("/transactions", auth, getTransactionHistory);
+router.get(
+  "/transactions",
+  auth,
+  validateQuery(paginationSchema),
+  getTransactionHistory
+);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Op, Sequelize } = require("sequelize");
+const { Op } = require("sequelize");
 const {
   Playlist,
   PlaylistSong,
@@ -118,7 +118,7 @@ const getPlaylistById = async (req, res) => {
               include: [
                 {
                   model: Artist,
-                  as: "Artist",
+                  as: "artist", // Fixed: use lowercase 'artist' to match the association alias
                   attributes: ["id", "stage_name"],
                 },
               ],
@@ -149,21 +149,13 @@ const getPlaylistById = async (req, res) => {
 
 // POST /playlists - Create new playlist
 const createPlaylist = async (req, res) => {
-  // Debug log to check user object
-  // console.log("REQ.USER:", req.user);
-  // Normalisasi role agar bisa pakai field role atau ROLE
-  const userRole = req.user.role || req.user.ROLE;
-  if (!userRole || userRole !== "user") {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
   upload.single("cover_image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
 
     try {
-      const { name, description, is_public, is_official } = req.body;
+      const { name, description, is_public } = req.body;
 
       // Validate required fields
       if (!name) {
@@ -464,6 +456,26 @@ const removeSongFromPlaylist = async (req, res) => {
   }
 };
 
+// Helper function to reorder playlist songs after removal
+const reorderPlaylistSongs = async (playlistId) => {
+  try {
+    const playlistSongs = await PlaylistSong.findAll({
+      where: { playlist_id: playlistId },
+      order: [["position", "ASC"]],
+    });
+
+    // Update positions to be sequential starting from 1
+    for (let i = 0; i < playlistSongs.length; i++) {
+      await playlistSongs[i].update({
+        position: i + 1,
+        updated_at: new Date(),
+      });
+    }
+  } catch (error) {
+    console.error("Reorder playlist songs error:", error);
+  }
+};
+
 // Helper function to update playlist statistics
 const updatePlaylistStats = async (playlistId) => {
   try {
@@ -472,7 +484,7 @@ const updatePlaylistStats = async (playlistId) => {
       include: [
         {
           model: Song,
-          as: "song",
+          as: "Song", // Fixed: use 'Song' to match the default association alias
           where: { deleted_at: null },
           required: false,
         },
@@ -481,7 +493,7 @@ const updatePlaylistStats = async (playlistId) => {
 
     const songCount = playlistSongs.length;
     const totalDuration = playlistSongs.reduce(
-      (sum, ps) => sum + (ps.song ? ps.song.duration : 0),
+      (sum, ps) => sum + (ps.Song ? ps.Song.duration_seconds : 0), // Fixed: use Song and duration_seconds
       0
     );
 

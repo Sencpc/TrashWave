@@ -18,12 +18,22 @@ const {
 
 const { auth, admin, artist } = require("../Middleware/auth");
 const { authLimiter, uploadLimiter } = require("../Middleware/rateLimiter");
+const {
+  validateBody,
+  validateQuery,
+  validateParams,
+} = require("../Middleware/validation");
+const {
+  registerArtistSchema,
+  updateArtistSchema,
+  paginationSchema,
+} = require("../validation/schemas");
 
 // Public routes
-router.get("/", getAllArtists);
+router.get("/", validateQuery(paginationSchema), getAllArtists);
 router.get("/:name", getArtistByName);
-router.get("/:name/songs", getArtistSongs);
-router.get("/:name/albums", getArtistAlbums);
+router.get("/:name/songs", validateQuery(paginationSchema), getArtistSongs);
+router.get("/:name/albums", validateQuery(paginationSchema), getArtistAlbums);
 router.post("/register", authLimiter, registerArtist);
 router.post("/:name/follow", auth, toggleFollowArtist);
 router.put("/:name", auth, artist, uploadLimiter, updateArtist);
