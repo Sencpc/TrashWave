@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const models = require("../Model/mIndex");
 const { registerArtistSchema } = require("../validation/schemas");
 const { Op } = require("sequelize");
-const SpotifyAPI = require("../utils/SpotifyAPI");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for artist profile picture
 const storage = multer.diskStorage({

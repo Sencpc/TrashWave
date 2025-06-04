@@ -10,7 +10,7 @@ const {
   User,
   UserLikePlaylist,
 } = require("../Model/mIndex");
-const SpotifyAPI = require("../utils/SpotifyAPI");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for playlist cover images
 const storage = multer.diskStorage({

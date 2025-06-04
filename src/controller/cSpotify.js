@@ -1,4 +1,4 @@
-const SpotifyAPI = require("../utils/SpotifyAPI");
+const SpotifyAPI = require("../utils/spotifyAPI");
 
 // GET /spotify/search - Universal Spotify search
 const searchSpotify = async (req, res) => {
