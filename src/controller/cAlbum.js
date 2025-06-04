@@ -1,7 +1,14 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Album, Artist, Song, UserLikeAlbum } = require("../Model/mIndex");
+const { Op } = require("sequelize");
+const {
+  Album,
+  Artist,
+  Song,
+  UserLikeAlbum,
+  AlbumSong,
+} = require("../Model/mIndex");
 const SpotifyAPI = require("../utils/spotifyAPI");
 
 // Multer storage config for album cover images
@@ -36,29 +43,27 @@ const upload = multer({
 // GET /albums - Get all albums with pagination and filters
 const getAllAlbums = async (req, res) => {
   try {
-    const { page = 1, limit = 20, artist_id, genre, search } = req.query;
+    const { page = 1, limit = 20, genre, search } = req.query;
     const offset = (page - 1) * limit;
 
     const where = { deleted_at: null };
-    if (artist_id) where.artist_id = artist_id;
     if (genre) where.genre = genre;
     if (search) {
-      where[Album.sequelize.Op.or] = [
-        { title: { [Album.sequelize.Op.iLike]: `%${search}%` } },
-        { description: { [Album.sequelize.Op.iLike]: `%${search}%` } },
+      where[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
       ];
     }
-
     const albums = await Album.findAndCountAll({
       where,
       include: [
         {
           model: Artist,
           as: "artist",
-          attributes: ["id", "name", "profile_picture", "verification_status"],
+          attributes: ["id", "stage_name", "real_name"],
         },
       ],
-      order: [["release_date", "DESC"]],
+      order: [["created_at", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -82,22 +87,48 @@ const getAllAlbums = async (req, res) => {
 const getAlbumById = async (req, res) => {
   try {
     const { id } = req.params;
+    const albumId = parseInt(id, 10);
+
+    if (isNaN(albumId)) {
+      return res.status(400).json({ error: "Invalid album ID" });
+    }
 
     const album = await Album.findOne({
-      where: { id, deleted_at: null },
+      where: { id: albumId, deleted_at: null },
       include: [
         {
           model: Artist,
           as: "artist",
-          attributes: ["id", "name", "profile_picture", "verification_status"],
+          attributes: ["id", "stage_name", "real_name"],
         },
         {
           model: Song,
-          as: "songs",
+          as: "albumSongs",
+          through: {
+            model: AlbumSong,
+            where: { deleted_at: null },
+            attributes: ["track_number", "added_at"],
+          },
           where: { deleted_at: null },
           required: false,
-          order: [["track_number", "ASC"]],
+          attributes: [
+            "id",
+            "title",
+            "duration_seconds",
+            "file_url",
+            "cover_image",
+          ],
+          include: [
+            {
+              model: Artist,
+              as: "artist",
+              attributes: ["id", "stage_name", "real_name"],
+            },
+          ],
         },
+      ],
+      order: [
+        [{ model: Song, as: "albumSongs" }, AlbumSong, "track_number", "ASC"],
       ],
     });
 
@@ -120,11 +151,26 @@ const createAlbum = async (req, res) => {
     }
 
     try {
-      const { title, description, genre, release_date } = req.body;
-
-      // Validate required fields
+      const { title, description, genre, release_date } = req.body; // Validate required fields
       if (!title || !genre) {
         return res.status(400).json({ error: "Title and genre are required" });
+      } // Determine artist_id based on user ROLE
+      let artistId;
+      if (req.user.ROLE === "artist") {
+        // Find the artist record associated with this user
+        const artist = await Artist.findOne({
+          where: { user_id: req.user.id },
+        });
+        if (!artist) {
+          return res
+            .status(404)
+            .json({ error: "Artist profile not found for this user" });
+        }
+        artistId = artist.id;
+      } else if (req.user.role === "admin" && req.body.artist_id) {
+        artistId = req.body.artist_id;
+      } else {
+        return res.status(400).json({ error: "Artist ID is required" });
       }
 
       let coverImagePath = null;
@@ -134,8 +180,7 @@ const createAlbum = async (req, res) => {
 
       const album = await Album.create({
         title,
-        artist_id:
-          req.user.role === "artist" ? req.user.id : req.body.artist_id,
+        artist_id: artistId,
         description: description || null,
         genre,
         cover_image: coverImagePath,
@@ -146,18 +191,12 @@ const createAlbum = async (req, res) => {
         created_at: new Date(),
         updated_at: new Date(),
       });
-
       const albumWithDetails = await Album.findByPk(album.id, {
         include: [
           {
             model: Artist,
             as: "artist",
-            attributes: [
-              "id",
-              "name",
-              "profile_picture",
-              "verification_status",
-            ],
+            attributes: ["id", "stage_name", "real_name"],
           },
         ],
       });
@@ -179,22 +218,34 @@ const updateAlbum = async (req, res) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
-
     try {
       const { id } = req.params;
+      const albumId = parseInt(id, 10);
       const { title, description, genre, release_date } = req.body;
 
+      if (isNaN(albumId)) {
+        return res.status(400).json({ error: "Invalid album ID" });
+      }
+
       const album = await Album.findOne({
-        where: { id, deleted_at: null },
+        where: { id: albumId, deleted_at: null },
       });
 
       if (!album) {
         return res.status(404).json({ error: "Album not found" });
-      }
-
-      // Check ownership for artists
-      if (req.user.role === "artist" && album.artist_id !== req.user.id) {
-        return res.status(403).json({ error: "Access denied" });
+      } // Check ownership for artists
+      if (req.user.ROLE === "artist") {
+        const artist = await Artist.findOne({
+          where: { user_id: req.user.id },
+        });
+        if (!artist) {
+          return res
+            .status(404)
+            .json({ error: "Artist profile not found for this user" });
+        }
+        if (album.artist_id !== artist.id) {
+          return res.status(403).json({ error: "Access denied" });
+        }
       }
 
       const updateData = {};
@@ -208,18 +259,12 @@ const updateAlbum = async (req, res) => {
       updateData.updated_at = new Date();
 
       await album.update(updateData);
-
       const updatedAlbum = await Album.findByPk(id, {
         include: [
           {
             model: Artist,
             as: "artist",
-            attributes: [
-              "id",
-              "name",
-              "profile_picture",
-              "verification_status",
-            ],
+            attributes: ["id", "stage_name", "real_name"],
           },
         ],
       });
@@ -239,23 +284,37 @@ const updateAlbum = async (req, res) => {
 const deleteAlbum = async (req, res) => {
   try {
     const { id } = req.params;
+    const albumId = parseInt(id, 10);
+
+    if (isNaN(albumId)) {
+      return res.status(400).json({ error: "Invalid album ID" });
+    }
 
     const album = await Album.findOne({
-      where: { id, deleted_at: null },
+      where: { id: albumId, deleted_at: null },
     });
 
     if (!album) {
       return res.status(404).json({ error: "Album not found" });
-    }
-
-    // Check ownership for artists
-    if (req.user.role === "artist" && album.artist_id !== req.user.id) {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    // Soft delete album and its songs
-    await album.update({ deleted_at: new Date() });
-    await Song.update({ deleted_at: new Date() }, { where: { album_id: id } });
+    } // Check ownership for artists
+    if (req.user.ROLE === "artist") {
+      const artist = await Artist.findOne({
+        where: { user_id: req.user.id },
+      });
+      if (!artist) {
+        return res
+          .status(404)
+          .json({ error: "Artist profile not found for this user" });
+      }
+      if (album.artist_id !== artist.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+    } // Soft delete album and its relationships
+    await album.update({ deleted_at: new Date() }); // Soft delete all AlbumSong entries for this album
+    await AlbumSong.update(
+      { deleted_at: new Date() },
+      { where: { album_id: albumId, deleted_at: null } }
+    );
 
     return res.status(200).json({ message: "Album deleted successfully" });
   } catch (error) {
@@ -268,10 +327,15 @@ const deleteAlbum = async (req, res) => {
 const toggleLikeAlbum = async (req, res) => {
   try {
     const { id } = req.params;
+    const albumId = parseInt(id, 10);
     const userId = req.user.id;
 
+    if (isNaN(albumId)) {
+      return res.status(400).json({ error: "Invalid album ID" });
+    }
+
     const album = await Album.findOne({
-      where: { id, deleted_at: null },
+      where: { id: albumId, deleted_at: null },
     });
 
     if (!album) {
@@ -279,7 +343,7 @@ const toggleLikeAlbum = async (req, res) => {
     }
 
     const existingLike = await UserLikeAlbum.findOne({
-      where: { user_id: userId, album_id: id },
+      where: { user_id: userId, album_id: albumId },
     });
 
     if (existingLike) {
@@ -291,7 +355,7 @@ const toggleLikeAlbum = async (req, res) => {
       // Like
       await UserLikeAlbum.create({
         user_id: userId,
-        album_id: id,
+        album_id: albumId,
         created_at: new Date(),
       });
       await album.increment("like_count", { by: 1 });
@@ -307,23 +371,41 @@ const toggleLikeAlbum = async (req, res) => {
 const getAlbumSongs = async (req, res) => {
   try {
     const { id } = req.params;
+    const albumId = parseInt(id, 10);
 
-    const album = await Album.findByPk(id);
+    if (isNaN(albumId)) {
+      return res.status(400).json({ error: "Invalid album ID" });
+    }
+
+    const album = await Album.findByPk(albumId);
     if (!album) {
       return res.status(404).json({ error: "Album not found" });
     }
 
-    const songs = await Song.findAll({
-      where: { album_id: id, deleted_at: null },
+    const albumSongs = await AlbumSong.findAll({
+      where: { album_id: albumId, deleted_at: null },
       include: [
         {
-          model: Artist,
-          as: "artist",
-          attributes: ["id", "name", "profile_picture"],
+          model: Song,
+          where: { deleted_at: null },
+          include: [
+            {
+              model: Artist,
+              as: "artist",
+              attributes: ["id", "stage_name", "real_name"],
+            },
+          ],
         },
       ],
       order: [["track_number", "ASC"]],
     });
+
+    // Extract songs with track information
+    const songs = albumSongs.map((albumSong) => ({
+      ...albumSong.Song.toJSON(),
+      track_number: albumSong.track_number,
+      added_at: albumSong.added_at,
+    }));
 
     return res.status(200).json({ songs });
   } catch (error) {
@@ -336,23 +418,37 @@ const getAlbumSongs = async (req, res) => {
 const addSongToAlbum = async (req, res) => {
   try {
     const { id, songId } = req.params;
+    const albumId = parseInt(id, 10);
+    const songIdInt = parseInt(songId, 10);
     const { track_number } = req.body;
 
+    if (isNaN(albumId) || isNaN(songIdInt)) {
+      return res.status(400).json({ error: "Invalid album or song ID" });
+    }
+
     const album = await Album.findOne({
-      where: { id, deleted_at: null },
+      where: { id: albumId, deleted_at: null },
     });
 
     if (!album) {
       return res.status(404).json({ error: "Album not found" });
-    }
-
-    // Check ownership for artists
-    if (req.user.role === "artist" && album.artist_id !== req.user.id) {
-      return res.status(403).json({ error: "Access denied" });
+    } // Check ownership for artists
+    if (req.user.ROLE === "artist") {
+      const artist = await Artist.findOne({
+        where: { user_id: req.user.id },
+      });
+      if (!artist) {
+        return res
+          .status(404)
+          .json({ error: "Artist profile not found for this user" });
+      }
+      if (album.artist_id !== artist.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
     }
 
     const song = await Song.findOne({
-      where: { id: songId, deleted_at: null },
+      where: { id: songIdInt, deleted_at: null },
     });
 
     if (!song) {
@@ -364,16 +460,33 @@ const addSongToAlbum = async (req, res) => {
       return res
         .status(400)
         .json({ error: "Song must belong to the same artist" });
+    } // Check if song is already in album
+    const existingEntry = await AlbumSong.findOne({
+      where: { album_id: albumId, song_id: songIdInt, deleted_at: null },
+    });
+
+    if (existingEntry) {
+      return res.status(400).json({ error: "Song already in album" });
     }
 
-    // Update song's album
-    await song.update({
-      album_id: id,
-      track_number: track_number || null,
+    // Determine track number if not provided
+    let finalTrackNumber = track_number;
+    if (!finalTrackNumber) {
+      const maxTrack = await AlbumSong.max("track_number", {
+        where: { album_id: albumId, deleted_at: null },
+      });
+      finalTrackNumber = (maxTrack || 0) + 1;
+    }
+
+    // Create AlbumSong entry
+    await AlbumSong.create({
+      album_id: albumId,
+      song_id: songIdInt,
+      track_number: finalTrackNumber,
     });
 
     // Update album stats
-    await updateAlbumStats(id);
+    await updateAlbumStats(albumId);
 
     return res
       .status(200)
@@ -388,36 +501,47 @@ const addSongToAlbum = async (req, res) => {
 const removeSongFromAlbum = async (req, res) => {
   try {
     const { id, songId } = req.params;
+    const albumId = parseInt(id, 10);
+    const songIdInt = parseInt(songId, 10);
+
+    if (isNaN(albumId) || isNaN(songIdInt)) {
+      return res.status(400).json({ error: "Invalid album or song ID" });
+    }
 
     const album = await Album.findOne({
-      where: { id, deleted_at: null },
+      where: { id: albumId, deleted_at: null },
     });
 
     if (!album) {
       return res.status(404).json({ error: "Album not found" });
+    } // Check ownership for artists
+    if (req.user.ROLE === "artist") {
+      const artist = await Artist.findOne({
+        where: { user_id: req.user.id },
+      });
+      if (!artist) {
+        return res
+          .status(404)
+          .json({ error: "Artist profile not found for this user" });
+      }
+      if (album.artist_id !== artist.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
     }
 
-    // Check ownership for artists
-    if (req.user.role === "artist" && album.artist_id !== req.user.id) {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    const song = await Song.findOne({
-      where: { id: songId, album_id: id, deleted_at: null },
+    const albumSong = await AlbumSong.findOne({
+      where: { album_id: albumId, song_id: songIdInt, deleted_at: null },
     });
 
-    if (!song) {
+    if (!albumSong) {
       return res.status(404).json({ error: "Song not found in this album" });
     }
 
-    // Remove song from album
-    await song.update({
-      album_id: null,
-      track_number: null,
-    });
-
-    // Update album stats
-    await updateAlbumStats(id);
+    // Remove song from album (soft delete)
+    await albumSong.update({
+      deleted_at: new Date(),
+    }); // Update album stats
+    await updateAlbumStats(albumId);
 
     return res
       .status(200)
@@ -431,17 +555,29 @@ const removeSongFromAlbum = async (req, res) => {
 // Helper function to update album statistics
 const updateAlbumStats = async (albumId) => {
   try {
-    const songs = await Song.findAll({
+    // Get songs through AlbumSong junction table
+    const albumSongs = await AlbumSong.findAll({
       where: { album_id: albumId, deleted_at: null },
+      include: [
+        {
+          model: Song,
+          where: { deleted_at: null },
+          attributes: ["duration_seconds"],
+        },
+      ],
     });
 
-    const totalTracks = songs.length;
-    const totalDuration = songs.reduce((sum, song) => sum + song.duration, 0);
+    const totalTracks = albumSongs.length;
+    const totalDuration = albumSongs.reduce(
+      (sum, albumSong) =>
+        sum + (albumSong.Song ? albumSong.Song.duration_seconds : 0),
+      0
+    );
 
     await Album.update(
       {
         total_tracks: totalTracks,
-        total_duration: totalDuration,
+        duration_seconds: totalDuration,
         updated_at: new Date(),
       },
       { where: { id: albumId } }

@@ -17,6 +17,17 @@ module.exports = (sequelize, DataTypes) => {
         through: models.PlaylistSong,
         foreignKey: "song_id",
       });
+      // Many-to-many relationship with Albums through AlbumSong
+      Song.belongsToMany(models.Album, {
+        through: models.AlbumSong,
+        foreignKey: "song_id",
+        otherKey: "album_id",
+        as: "albumsViaJunction",
+      });
+      Song.hasMany(models.AlbumSong, {
+        foreignKey: "song_id",
+        as: "albumSongEntries",
+      });
     }
   }
 

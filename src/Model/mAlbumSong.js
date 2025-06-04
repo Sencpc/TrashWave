@@ -2,27 +2,19 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class UserLikeAlbum extends Model {
+  class AlbumSong extends Model {
     static associate(models) {
-      UserLikeAlbum.belongsTo(models.User, { foreignKey: "user_id" });
-      UserLikeAlbum.belongsTo(models.Album, { foreignKey: "album_id" });
+      AlbumSong.belongsTo(models.Album, { foreignKey: "album_id" });
+      AlbumSong.belongsTo(models.Song, { foreignKey: "song_id" });
     }
   }
 
-  UserLikeAlbum.init(
+  AlbumSong.init(
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "users",
-          key: "id",
-        },
       },
       album_id: {
         type: DataTypes.INTEGER,
@@ -31,6 +23,23 @@ module.exports = (sequelize, DataTypes) => {
           model: "albums",
           key: "id",
         },
+      },
+      song_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "songs",
+          key: "id",
+        },
+      },
+      track_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      added_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -42,26 +51,32 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      deleted_at: {
+        type: DataTypes.DATE,
+      },
     },
     {
       sequelize,
-      modelName: "UserLikeAlbum",
-      tableName: "user_like_albums",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
+      modelName: "AlbumSong",
+      tableName: "album_songs",
+      timestamps: false,
+      paranoid: true,
       indexes: [
         {
           unique: true,
-          fields: ["user_id", "album_id"],
+          fields: ["album_id", "song_id"],
+        },
+        {
+          unique: true,
+          fields: ["album_id", "track_number"],
         },
       ],
       name: {
-        singular: "UserLikeAlbum",
-        plural: "UserLikeAlbums",
+        singular: "AlbumSong",
+        plural: "AlbumSongs",
       },
     }
   );
 
-  return UserLikeAlbum;
+  return AlbumSong;
 };

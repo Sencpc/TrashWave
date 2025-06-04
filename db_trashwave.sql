@@ -1,7 +1,6 @@
 	-- Database: db_trashwave
 	-- TrashWave Music Streaming Platform Database Schema
 	-- Updated: 2025-05-29
-	DROP DATABASE IF EXISTS db_trashwave;
 	CREATE DATABASE IF NOT EXISTS db_trashwave;
 	USE db_trashwave;
 
@@ -205,6 +204,22 @@
 	  deleted_at DATETIME DEFAULT NULL,
 	  UNIQUE KEY unique_playlist_song (playlist_id, song_id),
 	  FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
+	  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE	);
+
+	-- Album Songs Junction Table
+	DROP TABLE IF EXISTS album_songs;
+	CREATE TABLE album_songs (
+	  id INT AUTO_INCREMENT PRIMARY KEY,
+	  album_id INT NOT NULL,
+	  song_id INT NOT NULL,
+	  track_number INT NOT NULL,
+	  added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  deleted_at DATETIME DEFAULT NULL,
+	  UNIQUE KEY unique_album_song (album_id, song_id),
+	  UNIQUE KEY unique_album_track (album_id, track_number),
+	  FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE,
 	  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
 	);
 
@@ -282,7 +297,6 @@
 	  artist_id INT NOT NULL,
 	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  deleted_at DATETIME DEFAULT NULL,
 	  UNIQUE KEY unique_user_artist (user_id, artist_id),
 	  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	  FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
@@ -296,7 +310,6 @@
 	  song_id INT NOT NULL,
 	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  deleted_at DATETIME DEFAULT NULL,
 	  UNIQUE KEY unique_user_song (user_id, song_id),
 	  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
@@ -310,7 +323,6 @@
 	  playlist_id INT NOT NULL,
 	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  deleted_at DATETIME DEFAULT NULL,
 	  UNIQUE KEY unique_user_playlist (user_id, playlist_id),
 	  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	  FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
@@ -324,7 +336,6 @@
 	  album_id INT NOT NULL,
 	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  deleted_at DATETIME DEFAULT NULL,
 	  UNIQUE KEY unique_user_album (user_id, album_id),
 	  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	  FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
@@ -341,7 +352,6 @@
 	  download_completed TINYINT(1) DEFAULT 0,
 	  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  deleted_at DATETIME DEFAULT NULL,
 	  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
 	);
@@ -435,8 +445,48 @@
 
 	-- Ardhito Songs
 	('fine today', 5, 11, 'https://cdn.trashwave.id/audio/ardhito_fine_today.mp3', 'https://cdn.trashwave.id/covers/ardhito_letter.jpg', 198, 'Indie Pop', 'Im fine today\nEverything will be okay...', 4500000, 28000, 7500, '2020-01-17', 0, 7948800, 320, 'ardhito_fine_today', '2024-04-15 13:30:00'),
-	('cigarettes of ours', 5, 11, 'https://cdn.trashwave.id/audio/ardhito_cigarettes.mp3', 'https://cdn.trashwave.id/covers/ardhito_letter.jpg', 234, 'Alternative', 'Cigarettes of ours\nBurning in the summer hours...', 6200000, 35000, 9000, '2020-01-17', 0, 9388800, 320, 'ardhito_cigarettes', '2024-04-15 13:32:00'),
-	('sudah', 5, 11, 'https://cdn.trashwave.id/audio/ardhito_sudah.mp3', 'https://cdn.trashwave.id/covers/ardhito_letter.jpg', 189, 'Indie Pop', 'Sudah cukup rasanya\nUntuk bersamamu...', 3800000, 24000, 6200, '2020-01-17', 0, 7579200, 320, 'ardhito_sudah', '2024-04-15 13:34:00');
+	('cigarettes of ours', 5, 11, 'https://cdn.trashwave.id/audio/ardhito_cigarettes.mp3', 'https://cdn.trashwave.id/covers/ardhito_letter.jpg', 234, 'Alternative', 'Cigarettes of ours\nBurning in the summer hours...', 6200000, 35000, 9000, '2020-01-17', 0, 9388800, 320, 'ardhito_cigarettes', '2024-04-15 13:32:00'),	('sudah', 5, 11, 'https://cdn.trashwave.id/audio/ardhito_sudah.mp3', 'https://cdn.trashwave.id/covers/ardhito_letter.jpg', 189, 'Indie Pop', 'Sudah cukup rasanya\nUntuk bersamamu...', 3800000, 24000, 6200, '2020-01-17', 0, 7579200, 320, 'ardhito_sudah', '2024-04-15 13:34:00');
+
+	-- Insert Album Songs Junction Table
+	INSERT INTO album_songs (album_id, song_id, track_number, added_at, created_at) VALUES
+	-- Raisa's Heart to Heart Album
+	(1, 1, 1, '2024-02-15 10:30:00', '2024-02-15 10:30:00'), -- Could It Be
+	(1, 2, 2, '2024-02-15 10:32:00', '2024-02-15 10:32:00'), -- Serba Salah
+	
+	-- Raisa's Let Me Be Album
+	(2, 3, 1, '2024-02-15 10:35:00', '2024-02-15 10:35:00'), -- LDR
+	
+	-- Raisa's Handmade Album
+	(3, 4, 1, '2024-02-15 10:40:00', '2024-02-15 10:40:00'), -- Kali Kedua
+	
+	-- Afgan's Confession No. 1 Album
+	(4, 5, 1, '2024-03-10 14:25:00', '2024-03-10 14:25:00'), -- Sadis
+	(4, 6, 2, '2024-03-10 14:27:00', '2024-03-10 14:27:00'), -- Jangan Sampai Tiga Kali
+	
+	-- Afgan's The One Album
+	(5, 7, 1, '2024-03-10 14:30:00', '2024-03-10 14:30:00'), -- M.A.L
+	
+	-- Isyana's Explore! Album
+	(6, 8, 1, '2024-03-20 09:20:00', '2024-03-20 09:20:00'), -- Keep Being You
+	(6, 9, 2, '2024-03-20 09:22:00', '2024-03-20 09:22:00'), -- Tetap Dalam Jiwa
+	
+	-- Isyana's Paradox Album
+	(7, 10, 1, '2024-03-20 09:25:00', '2024-03-20 09:25:00'), -- Anganku Anganmu
+	
+	-- Tulus's Gajah Album
+	(8, 11, 1, '2024-04-05 11:50:00', '2024-04-05 11:50:00'), -- Gajah
+	(8, 12, 2, '2024-04-05 11:52:00', '2024-04-05 11:52:00'), -- Sepatu
+	
+	-- Tulus's Monokrom Album
+	(9, 13, 1, '2024-04-05 11:55:00', '2024-04-05 11:55:00'), -- Monokrom
+	
+	-- Tulus's Manusia Album
+	(10, 14, 1, '2024-04-05 12:00:00', '2024-04-05 12:00:00'), -- Ruang Sendiri
+	
+	-- Ardhito's Letter to God Album
+	(11, 15, 1, '2024-04-15 13:30:00', '2024-04-15 13:30:00'), -- fine today
+	(11, 16, 2, '2024-04-15 13:32:00', '2024-04-15 13:32:00'), -- cigarettes of ours
+	(11, 17, 3, '2024-04-15 13:34:00', '2024-04-15 13:34:00'); -- sudah
 
 	-- Insert Playlists
 	INSERT INTO playlists (NAME, DESCRIPTION, user_id, cover_image, is_public, is_official, like_count, total_songs, total_duration, created_at) VALUES

@@ -34,7 +34,12 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      liked_at: {
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
@@ -44,7 +49,9 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "UserLikePlaylist",
       tableName: "user_like_playlists",
-      timestamps: false,
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
       indexes: [
         {
           unique: true,

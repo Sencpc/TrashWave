@@ -41,20 +41,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      deleted_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
     },
     {
       sequelize,
       modelName: "UserLikeSong",
       tableName: "user_like_songs",
       timestamps: true,
-      paranoid: true,
       createdAt: "created_at",
       updatedAt: "updated_at",
-      deletedAt: "deleted_at",
       indexes: [
         {
           unique: true,

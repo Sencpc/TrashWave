@@ -13,6 +13,7 @@ const Album = require("./mAlbum")(sequelize, DataTypes);
 const Song = require("./mSong")(sequelize, DataTypes);
 const Playlist = require("./mPlaylist")(sequelize, DataTypes);
 const PlaylistSong = require("./mPlaylistSong")(sequelize, DataTypes);
+const AlbumSong = require("./mAlbumSong")(sequelize, DataTypes);
 const SubscriptionPlan = require("./mSubscriptionPlan")(sequelize, DataTypes);
 const PaymentTransaction = require("./mPaymentTransaction")(
   sequelize,
@@ -37,6 +38,7 @@ db.Album = Album;
 db.Song = Song;
 db.Playlist = Playlist;
 db.PlaylistSong = PlaylistSong;
+db.AlbumSong = AlbumSong;
 db.SubscriptionPlan = SubscriptionPlan;
 db.PaymentTransaction = PaymentTransaction;
 db.UserFollowArtist = UserFollowArtist;

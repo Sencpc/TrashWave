@@ -26,23 +26,25 @@
     "db:force": "node -e \"require('./src/db/sync').syncDatabase(true)\"",
     "db:drop": "node -e \"require('./src/db/sync').dropDatabase()\""
   },
+  "engines": {
+    "node": ">=16.14.2 <17.0.0",
+    "npm": ">=8.5.0"
+  },
   "dependencies": {
-    "@joi/date": "^2.1.1",
-    "axios": "^1.9.0",
-    "bcrypt": "^6.0.0",
+    "@joi/date": "^2.1.0",
+    "axios": "^0.27.2",
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.5.0",
-    "joi": "^17.13.3",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.2",
-    "mysql2": "^3.14.1",
-    "nodemon": "^3.1.10",
-    "sequelize": "^6.37.7"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "joi": "^17.7.0",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.4",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.28.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.8.0"
+    "nodemon": "^2.0.20"
   }
 }
