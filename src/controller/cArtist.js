@@ -84,6 +84,7 @@ const getAllArtists = async (req, res) => {
       include: [
         {
           model: models.User,
+          as: "user",
           attributes: ["profile_picture"],
         },
       ],
@@ -115,7 +116,7 @@ const getArtistByName = async (req, res) => {
       include: [
         {
           model: models.Song,
-          as: "Songs",
+          as: "songs",
           where: { deleted_at: null },
           required: false,
           limit: 10,
@@ -123,7 +124,7 @@ const getArtistByName = async (req, res) => {
         },
         {
           model: models.Album,
-          as: "Albums",
+          as: "albums",
           where: { deleted_at: null },
           required: false,
           limit: 10,
@@ -328,7 +329,7 @@ const updateArtist = async (req, res) => {
       const { id } = req.params;
       const { name, bio, genres, social_links } = req.body;
 
-      const artist = await Artist.findOne({
+      const artist = await models.Artist.findOne({
         where: { id, deleted_at: null },
       });
 
@@ -460,7 +461,7 @@ const getArtistSongs = async (req, res) => {
       include: [
         {
           model: models.Album,
-          as: "Album",
+          as: "album",
           attributes: ["id", "title", "cover_image"],
         },
       ],

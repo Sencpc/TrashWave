@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      followed_at: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,

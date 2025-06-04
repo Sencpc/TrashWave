@@ -24,11 +24,7 @@ router.get("/:name", getArtistByName);
 router.get("/:name/songs", getArtistSongs);
 router.get("/:name/albums", getArtistAlbums);
 router.post("/register", registerArtist);
-
-// Authenticated routes
 router.post("/:name/follow", auth, toggleFollowArtist);
-
-// Artist/Admin routes
 router.put("/:name", auth, artist, updateArtist);
 
 // Admin only routes
