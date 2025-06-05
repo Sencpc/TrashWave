@@ -57,8 +57,8 @@ router.post(
 // Tambahan endpoint:
 router.get("/user", auth, getUser); // GET user by API key (header: x-api-key)
 router.get("/user/:username", getUserByUsername); // GET user by username (public)
-router.get("/quota", auth, getUserQuota); // GET /api/v1/account/quota (header: x-api-key)
-router.delete("/delete", validateBody(deleteAccountSchema), deleteAccount); // DELETE account (header: x-api-key)
+router.get("/quota", auth, getUserQuota); // GET /api/v1/account/quota
+router.delete("/delete", validateBody(deleteAccountSchema), auth, deleteAccount); // DELETE account
 
 // Subscription endpoints:
 router.get("/subscription/plans", getSubscriptionPlans); // GET subscription plans
