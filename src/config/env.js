@@ -76,6 +76,18 @@ const config = {
       acquire: 30000,
       idle: 10000,
     },
+    dialectOptions:
+      process.env.NODE_ENV === "production"
+        ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false,
+            },
+          }
+        : {},
+    retry: {
+      max: 3,
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET,

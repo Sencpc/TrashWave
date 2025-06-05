@@ -27,7 +27,7 @@
     "db:drop": "node -e \"require('./src/db/sync').dropDatabase()\""
   },
   "engines": {
-    "node": ">=16.14.2 <17.0.0",
+    "node": ">=16.14.2",
     "npm": ">=8.5.0"
   },
   "dependencies": {
