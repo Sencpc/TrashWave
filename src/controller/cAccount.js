@@ -664,16 +664,13 @@ const getTransactionHistory = async (req, res) => {
 
 const deleteAccount = async (req, res) => {
   try {
-    // Check API key in header
-    const apiKey = req.headers["x-api-key"];
-    if (!apiKey) {
+    if (!req.user) {
       return res.status(401).json({ error: "API key required" });
     }
 
-    // Find user by API key
-    const user = await User.findOne({ where: { api_key: apiKey } });
+    const user = await User.findOne({ where: { id: req.user.id } });
     if (!user) {
-      return res.status(401).json({ error: "Invalid API key" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Optional: Require password confirmation for security
