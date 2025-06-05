@@ -107,11 +107,7 @@ const startServer = async () => {
       }
     }
 
-    // Sync database (uncomment when ready)
-    // await syncDatabase();
-
-    // Start server with proper error handling for Railway
-    const server = app.listen(port, "0.0.0.0", () => {
+    const server = app.listen(port, () => {
       console.log(`🚀 ${config.app.name} API Server running on port ${port}`);
       console.log(`📖 API Documentation: http://localhost:${port}/api/v1/docs`);
       console.log(`💚 Health Check: http://localhost:${port}/health`);
