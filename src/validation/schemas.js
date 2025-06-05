@@ -319,6 +319,12 @@ const createAdminSchema = Joi.object({
     .label("Gender"),
 });
 
+const deleteAccountSchema = Joi.object({
+  password: Joi.string().optional().label("Password").messages({
+    "string.min": "{{#label}} must be at least 6 characters long",
+  }),
+});
+
 module.exports = {
   // Auth schemas
   accountSchema,
@@ -326,6 +332,7 @@ module.exports = {
   loginSchema,
   updateProfileSchema,
   changePasswordSchema,
+  deleteAccountSchema,
 
   // Artist schemas
   updateArtistSchema,

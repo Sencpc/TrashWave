@@ -130,7 +130,6 @@ TrashWave/
 │   │   ├── cArtist.js   # Artist management (registration, profiles, follows)
 │   │   ├── cAlbum.js    # Album operations (CRUD, song management)
 │   │   ├── cPlaylist.js # Playlist operations (CRUD, song management)
-│   │   ├── cUser.js     # User profile and relationship management
 │   │   ├── cAdmin.js    # Admin dashboard and management functions
 │   │   ├── cAd.js       # Advertisement management and analytics
 │   │   ├── cSpotify.js  # Spotify API integration
@@ -162,14 +161,12 @@ TrashWave/
 │   │   ├── mSubscriptionPlan.js # Subscription plan definitions
 │   │   └── mIndex.js    # Model registry and associations
 │   ├── routes/         # API route definitions
-│   │   ├── rAccount.js  # Account routes (/api/v1/account)
+│   │   ├── rAccount.js  # Account & subscription routes (/api/v1/account)
 │   │   ├── rSong.js     # Song routes (/api/v1/songs)
 │   │   ├── rArtist.js   # Artist routes (/api/v1/artists)
 │   │   ├── rAlbum.js    # Album routes (/api/v1/albums)
 │   │   ├── rPlaylist.js # Playlist routes (/api/v1/playlists)
-│   │   ├── rUser.js     # User routes (/api/v1/users)
 │   │   ├── rAdmin.js    # Admin routes (/api/v1/admin)
-│   │   ├── rSubscription.js # Subscription routes (/api/v1/subscriptions)
 │   │   ├── rAd.js       # Ad routes (/api/v1/ads)
 │   │   └── rSpotify.js  # Spotify routes (/api/v1/spotify)
 │   ├── utils/          # Utility functions and helpers
@@ -353,13 +350,13 @@ TrashWave/
 
 **Public Endpoints:**
 
-- `GET /api/v1/subscriptions/plans` - Get all available subscription plans
+- `GET /api/v1/account/subscription/plans` - Get all available subscription plans
 
 **Authenticated Endpoints:**
 
-- `POST /api/v1/subscriptions/subscribe` - Subscribe to a subscription plan
-- `GET /api/v1/subscriptions/current` - Get current user's subscription
-- `GET /api/v1/subscriptions/transactions` - Get user's transaction history
+- `POST /api/v1/account/subscription/subscribe` - Subscribe to a subscription plan
+- `GET /api/v1/account/subscription/current` - Get current user's subscription
+- `GET /api/v1/account/subscription/transactions` - Get user's transaction history
 
 ### Advertisement System
 

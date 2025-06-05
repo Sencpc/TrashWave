@@ -125,6 +125,64 @@ const createAd = async (req, res) => {
   }
 };
 
+const deleteAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ad = await Ad.findByPk(id);
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "Ad not found",
+      });
+    }
+
+    // Check if user owns the ad or is admin
+    if (ad.advertiser_id !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this ad",
+      });
+    }
+
+    // Delete associated files
+    if (ad.image_url) {
+      const imagePath = path.join(process.cwd(), ad.image_url);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    if (ad.video_url) {
+      const videoPath = path.join(process.cwd(), ad.video_url);
+      if (fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath);
+      }
+    }
+
+    if (ad.audio_url) {
+      const audioPath = path.join(process.cwd(), ad.audio_url);
+      if (fs.existsSync(audioPath)) {
+        fs.unlinkSync(audioPath);
+      }
+    }
+
+    await ad.destroy();
+
+    res.json({
+      success: true,
+      message: "Ad deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting ad:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete ad",
+    });
+  }
+};
+
 // Watch ad - Get random active ad (for free tier users with 0 streaming quota)
 const watchAd = async (req, res) => {
   try {
@@ -197,4 +255,5 @@ module.exports = {
   uploadMiddleware,
   createAd,
   watchAd,
+  deleteAd,
 };

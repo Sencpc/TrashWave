@@ -9,6 +9,7 @@ const { accountSchema, subscribeSchema } = require("../validation/schemas");
 const {
   User,
   PaymentTransaction,
+  SubscriptionPlan,
   UserLikeSong,
   UserLikeAlbum,
   UserLikePlaylist,
@@ -177,14 +178,12 @@ const logout = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    // Check API key in header
-    const apiKey = req.headers["x-api-key"];
-    if (!apiKey) {
+    if (!req.user) {
       return res.status(401).json({ error: "API key required" });
     }
 
     // Find user by API key
-    const user = await User.findOne({ where: { api_key: apiKey } });
+    const user = await User.findOne({ where: { id: req.user.id } });
     if (!user) {
       return res.status(401).json({ error: "Invalid API key" });
     }
@@ -241,12 +240,11 @@ const updateProfile = async (req, res) => {
 // GET user by API key (profil sendiri)
 const getUser = async (req, res) => {
   try {
-    const apiKey = req.headers["x-api-key"];
-    if (!apiKey) {
+    if (!req.user) {
       return res.status(401).json({ error: "API key required" });
     }
     const user = await User.findOne({
-      where: { api_key: apiKey },
+      where: { id: req.user.id },
       attributes: [
         "id",
         "username",
@@ -477,44 +475,279 @@ const subscribeUser = async (req, res) => {
   }
 };
 
-const getUserQuota = async (req, res) => {
+// GET /account/subscription/plans - Get all subscription plans
+const getSubscriptionPlans = async (req, res) => {
+  try {
+    const plans = await SubscriptionPlan.findAll({
+      where: { is_active: true },
+      order: [["price", "ASC"]],
+    });
+
+    return res.status(200).json({ plans });
+  } catch (error) {
+    console.error("Get subscription plans error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch subscription plans" });
+  }
+};
+
+// POST /account/subscription/subscribe - Subscribe to a plan
+const subscribeToPlан = async (req, res) => {
+  try {
+    const { plan_id, payment_method } = req.body;
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    const user = await User.findOne({ where: { api_key: apiKey } });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    if (!plan_id || !payment_method) {
+      return res
+        .status(400)
+        .json({ error: "Plan ID and payment method are required" });
+    }
+
+    const plan = await SubscriptionPlan.findByPk(plan_id);
+    if (!plan || !plan.is_active) {
+      return res
+        .status(404)
+        .json({ error: "Subscription plan not found or inactive" });
+    }
+
+    // Create payment transaction
+    const transaction = await PaymentTransaction.create({
+      user_id: user.id,
+      subscription_plan_id: plan_id,
+      amount: plan.price,
+      currency: "IDR",
+      payment_method,
+      payment_provider: "internal",
+      transaction_id: crypto.randomUUID(),
+      status: "pending",
+      payment_date: new Date(),
+    });
+
+    // In a real application, you would integrate with a payment processor here
+    // For now, we'll simulate successful payment
+
+    // Update user subscription
+    await user.update({
+      subscription_plan_id: plan_id,
+      api_level: plan.name.toLowerCase().replace(" ", "_"),
+      streaming_quota: plan.streaming_limit || -1,
+      download_quota: plan.download_limit || -1,
+      subscription_expires_at: new Date(
+        Date.now() + (plan.duration_days || 30) * 24 * 60 * 60 * 1000
+      ),
+      updated_at: new Date(),
+    });
+
+    // Update transaction status
+    await transaction.update({
+      status: "completed",
+      processed_at: new Date(),
+    });
+
+    return res.status(200).json({
+      message: "Subscription successful",
+      subscription: {
+        plan: plan.name,
+        streaming_quota: plan.streaming_limit || -1,
+        download_quota: plan.download_limit || -1,
+        expires_at: new Date(
+          Date.now() + (plan.duration_days || 30) * 24 * 60 * 60 * 1000
+        ),
+      },
+      transaction_id: transaction.id,
+    });
+  } catch (error) {
+    console.error("Subscribe error:", error);
+    return res.status(500).json({ error: "Failed to process subscription" });
+  }
+};
+
+// GET /account/subscription/current - Get current user subscription
+const getCurrentSubscription = async (req, res) => {
   try {
     const apiKey = req.headers["x-api-key"];
     if (!apiKey) {
       return res.status(401).json({ error: "API key required" });
     }
+
     const user = await User.findOne({
       where: { api_key: apiKey },
-      attributes: ["username", "streaming_quota", "download_quota"],
+      attributes: [
+        "api_level",
+        "streaming_quota",
+        "download_quota",
+        "subscription_expires_at",
+      ],
+      include: [
+        {
+          model: SubscriptionPlan,
+          as: "subscriptionPlan",
+          attributes: ["name", "description", "price"],
+        },
+      ],
     });
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    return res.json({
-      username: user.username,
-      streaming_quota: user.streaming_quota,
-      download_quota: user.download_quota,
+
+    return res.status(200).json({
+      subscription: {
+        plan: user.api_level,
+        streaming_quota: user.streaming_quota,
+        download_quota: user.download_quota,
+        expires_at: user.subscription_expires_at,
+        plan_details: user.subscriptionPlan,
+      },
     });
-  } catch (e) {
-    return res.status(500).json({ error: "Failed to get user quota" });
+  } catch (error) {
+    console.error("Get current subscription error:", error);
+    return res.status(500).json({ error: "Failed to fetch subscription" });
   }
 };
 
+// GET /account/subscription/transactions - Get user's transaction history
+const getTransactionHistory = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+    const apiKey = req.headers["x-api-key"];
+
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    const user = await User.findOne({ where: { api_key: apiKey } });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    const transactions = await PaymentTransaction.findAndCountAll({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: SubscriptionPlan,
+          as: "subscriptionPlan",
+          attributes: ["name", "duration_days"],
+        },
+      ],
+      order: [["created_at", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    return res.status(200).json({
+      transactions: transactions.rows,
+      pagination: {
+        total: transactions.count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(transactions.count / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Get transaction history error:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch transaction history" });
+  }
+};
+
+const deleteAccount = async (req, res) => {
+  try {
+    // Check API key in header
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    // Find user by API key
+    const user = await User.findOne({ where: { api_key: apiKey } });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    // Optional: Require password confirmation for security
+    const { password } = req.body;
+    if (password) {
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({ error: "Invalid password" });
+      }
+    }
+
+    // Soft delete approach - deactivate account instead of hard delete
+    await user.update({
+      is_active: false,
+      deleted_at: new Date(),
+      email: `deleted_${user.id}_${user.email}`, // Prevent email conflicts
+      username: `deleted_${user.id}_${user.username}`, // Prevent username conflicts
+      api_key: null, // Invalidate API key
+    });
+
+    return res.status(200).json({
+      message: "Account deleted successfully",
+      note: "Your account has been deactivated. Contact support if you wish to reactivate it.",
+    });
+  } catch (e) {
+    console.error("Delete account error:", e);
+    return res.status(500).json({ error: "Account deletion failed" });
+  }
+};
+
+// GET user quota information
+const getUserQuota = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "API key required" });
+    }
+
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: [
+        "id",
+        "username",
+        "api_level",
+        "streaming_quota",
+        "download_quota",
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({
+      quota: {
+        api_level: user.api_level,
+        streaming_quota: user.streaming_quota,
+        download_quota: user.download_quota,
+      },
+    });
+  } catch (error) {
+    console.error("Get user quota error:", error);
+    return res.status(500).json({ error: "Failed to fetch user quota" });
+  }
+};
+
+// Create admin account (Admin only)
 const createAdmin = async (req, res) => {
   try {
-    const {
-      username,
-      email,
-      password,
-      full_name,
-      date_of_birth,
-      country,
-      gender,
-    } = req.body;
-    // Cek username/email sudah ada
+    const { username, email, password, full_name } = req.body;
+
+    // Check if username or email already exists
     const exists = await User.findOne({
       where: {
-        [Op.or]: [{ username: username }, { email: email }],
+        [Op.or]: [{ username }, { email }],
       },
     });
     if (exists) {
@@ -523,39 +756,43 @@ const createAdmin = async (req, res) => {
         .json({ error: "Username or email already exists" });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate API key
     const apiKey = crypto.randomUUID();
 
-    // Set quota admin (bisa unlimited)
-    const quota = { streaming_quota: -1, download_quota: -1 };
+    // Set quota for admin (premium level)
+    const quota = getQuotaByApiLevel("premium");
 
-    const user = await User.create({
-      username: username,
-      email: email,
+    // Create admin user
+    const admin = await User.create({
+      username,
+      email,
       password_hash: hashedPassword,
-      full_name: full_name,
-      profile_picture: null,
-      date_of_birth: date_of_birth,
-      country: country,
-      gender: gender,
+      full_name,
       ROLE: "admin",
       streaming_quota: quota.streaming_quota,
       download_quota: quota.download_quota,
       is_active: true,
       api_key: apiKey,
       api_level: "premium",
-      api_quota: 0,
       created_at: new Date(),
       updated_at: new Date(),
     });
 
-    return res.status(201).json({ message: "Admin account created", user });
-  } catch (e) {
-    return res
-      .status(500)
-      .json({ error: "Admin registration failed", details: e.message });
+    // Remove sensitive info from response
+    const adminData = { ...admin.toJSON() };
+    delete adminData.password_hash;
+    delete adminData.api_key;
+
+    return res.status(201).json({
+      message: "Admin account created successfully",
+      admin: adminData,
+    });
+  } catch (error) {
+    console.error("Create admin error:", error);
+    return res.status(500).json({ error: "Failed to create admin account" });
   }
 };
 
@@ -582,4 +819,9 @@ module.exports = {
   subscribeUser,
   getUserQuota,
   createAdmin,
+  deleteAccount,
+  getSubscriptionPlans,
+  subscribeToPlан,
+  getCurrentSubscription,
+  getTransactionHistory,
 };

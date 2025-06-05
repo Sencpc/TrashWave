@@ -33,7 +33,7 @@ router.get("/watch", auth, adLimiter, watchAd);
 // Authenticated routes (advertisers/admin)
 router.post("/", auth, uploadLimiter, uploadMiddleware, createAd);
 // router.put("/:id", auth, uploadMiddleware, updateAd);
-// router.delete("/:id", auth, deleteAd);
+router.delete("/:id", auth, deleteAd);
 // router.get("/:id/analytics", auth, getAdAnalytics);
 
 module.exports = router;

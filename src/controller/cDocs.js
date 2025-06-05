@@ -14,6 +14,12 @@ const getAPIDocumentation = (req, res) => {
         "PUT /account/profile": "Update user profile",
         "PUT /account/password": "Change password",
         "DELETE /account": "Delete user account",
+        "GET /account/subscription/plans": "Get available subscription plans",
+        "POST /account/subscription/subscribe":
+          "Subscribe to a subscription plan",
+        "GET /account/subscription/current": "Get current user's subscription",
+        "GET /account/subscription/transactions":
+          "Get user's transaction history",
       },
       songs: {
         "GET /songs": "Get all songs with pagination and filtering",
@@ -73,13 +79,6 @@ const getAPIDocumentation = (req, res) => {
         "GET /admin/analytics": "Get platform analytics",
         "GET /admin/reports": "Get content reports",
         "PUT /admin/reports/:id": "Update report status",
-      },
-      subscriptions: {
-        "GET /subscriptions/plans": "Get available subscription plans",
-        "POST /subscriptions/subscribe": "Subscribe to plan",
-        "PUT /subscriptions/upgrade": "Upgrade subscription",
-        "DELETE /subscriptions/cancel": "Cancel subscription",
-        "GET /subscriptions/history": "Get payment history",
       },
       ads: {
         "GET /ads": "Get all active ads",
