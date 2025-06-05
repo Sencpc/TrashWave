@@ -162,6 +162,13 @@ class SpotifyAPI {
 
       return response.data;
     } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          `Spotify API error: ${
+            error.response.data.error?.message || error.response.statusText
+          }`
+        );
+      }
       throw new Error("Failed to get album from Spotify");
     }
   }
@@ -206,6 +213,13 @@ class SpotifyAPI {
 
       return response.data.albums;
     } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          `Spotify API error: ${
+            error.response.data.error?.message || error.response.statusText
+          }`
+        );
+      }
       throw new Error("Failed to get albums from Spotify");
     }
   }
@@ -246,6 +260,13 @@ class SpotifyAPI {
 
       return response.data.artists;
     } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          `Spotify API error: ${
+            error.response.data.error?.message || error.response.statusText
+          }`
+        );
+      }
       throw new Error("Failed to get artists from Spotify");
     }
   }
@@ -269,6 +290,13 @@ class SpotifyAPI {
 
       return response.data;
     } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          `Spotify API error: ${
+            error.response.data.error?.message || error.response.statusText
+          }`
+        );
+      }
       throw new Error("Failed to get artist from Spotify");
     }
   }

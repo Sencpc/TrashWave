@@ -7,6 +7,10 @@ const { requestLogger } = require("./src/utils/logger");
 
 const app = express();
 
+// Trust proxy setting - required when running behind a proxy (nginx, load balancer, etc.)
+// This enables proper handling of X-Forwarded-For headers for rate limiting
+app.set("trust proxy", true);
+
 // Middleware
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
