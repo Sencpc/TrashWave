@@ -93,13 +93,16 @@ const getAllPlaylist = async (req, res) => {
   }
 };
 
-// GET /playlists/:id - Get playlist by ID with songs
-const getPlaylistById = async (req, res) => {
+// GET /playlists/:name - Get playlist by name with songs
+const getPlaylistByName = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { name } = req.params;
 
     const playlist = await Playlist.findOne({
-      where: { id, deleted_at: null },
+      where: { 
+        name: name,
+        deleted_at: null 
+      },
       include: [
         {
           model: User,
@@ -590,7 +593,7 @@ const searchSpotifyMultiple = async (req, res) => {
 
 module.exports = {
   getAllPlaylist,
-  getPlaylistById,
+  getPlaylistByName,
   createPlaylist,
   updatePlaylist,
   deletePlaylist,

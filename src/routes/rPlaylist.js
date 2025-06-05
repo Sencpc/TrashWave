@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   getAllPlaylist,
-  getPlaylistById,
+  getPlaylistByName,
   createPlaylist,
   updatePlaylist,
   deletePlaylist,
@@ -45,7 +45,7 @@ router.get(
   searchSpotifyMultiple
 );
 router.get("/spotify/:playlistId", getSpotifyPlaylist);
-router.get("/:id", getPlaylistById);
+router.get("/:name", getPlaylistByName);
 
 // Authenticated routes
 router.post("/", auth, uploadLimiter, createPlaylist);
