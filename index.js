@@ -33,6 +33,7 @@ const rAdmin = require("./src/routes/rAdmin");
 const rAd = require("./src/routes/rAd");
 const rSpotify = require("./src/routes/rSpotify");
 const { getAPIDocumentation } = require("./src/controller/cDocs");
+const { sequelize } = require("./src/config/db");
 
 // Register API endpoints
 app.use("/api/v1/account", rAccount);
@@ -49,11 +50,23 @@ app.get("/api/v1/docs", getAPIDocumentation);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({
+  res.status(200).json({
     status: "OK",
     message: "TrashWave API is running",
     documentation: `${req.protocol}://${req.get("host")}/api/v1/docs`,
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development",
+    version: config.app.version,
+    uptime: process.uptime(),
+  });
+});
+
+// Railway health check (alternative endpoint)
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "TrashWave API is running",
+    docs: `${req.protocol}://${req.get("host")}/api/v1/docs`,
   });
 });
 
@@ -78,22 +91,52 @@ app.use((err, req, res, next) => {
   });
 });
 
-const port = config.app.port;
+const port = config.app.port || process.env.PORT || 3000;
 
 // Initialize database and start server
 const startServer = async () => {
   try {
-    // Sync database
+    // Test database connection
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Database connection has been established successfully.");
+    } catch (dbError) {
+      console.error("❌ Unable to connect to the database:", dbError.message);
+      if (process.env.NODE_ENV === "production") {
+        console.error("🔄 Continuing without database for health checks...");
+      }
+    }
+
+    // Sync database (uncomment when ready)
     // await syncDatabase();
 
-    // Start server
-    app.listen(port, () => {
+    // Start server with proper error handling for Railway
+    const server = app.listen(port, "0.0.0.0", () => {
       console.log(`🚀 ${config.app.name} API Server running on port ${port}`);
       console.log(`📖 API Documentation: http://localhost:${port}/api/v1/docs`);
       console.log(`💚 Health Check: http://localhost:${port}/health`);
       if (config.app.isDevelopment) {
         console.log(`🔧 Development mode - Enhanced logging enabled`);
       }
+    });
+
+    // Handle server errors
+    server.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        console.error(`❌ Port ${port} is already in use`);
+      } else {
+        console.error("❌ Server error:", error);
+      }
+      process.exit(1);
+    });
+
+    // Graceful shutdown
+    process.on("SIGTERM", () => {
+      console.log("🛑 SIGTERM received, shutting down gracefully");
+      server.close(() => {
+        console.log("✅ Server closed");
+        process.exit(0);
+      });
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
