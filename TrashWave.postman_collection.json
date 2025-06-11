@@ -1,0 +1,2731 @@
+{
+	"info": {
+		"_postman_id": "f6618c4d-19bb-4c13-ba2c-122a99f529c7",
+		"name": "TrashWave",
+		"description": "proyek webservice seru",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42483212",
+		"_collection_link": "https://trashwave.postman.co/workspace/TrashWave~3dc3af68-15d7-4673-87e2-1d8757bc966a/collection/42483023-f6618c4d-19bb-4c13-ba2c-122a99f529c7?action=share&source=collection_link&creator=42483212"
+	},
+	"item": [
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Create Account",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "testusers",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "testusers@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "confirm_password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "full_name",
+									"value": "Test User",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "2000-01-01",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Indonesia",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "postman-cloud:///1f03c98f-cc8a-49b0-86fe-c929c9bf0fe5"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "testusers@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Artis",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "raisa@trashwave.id",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Username",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "key",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "tests@example.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/user/:username",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"user",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "raisa_official"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Own Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "key",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "81394725-d51d-411e-9bb9-2c1135688aad",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "tests@example.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Subscription",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "key",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "620460b1-06dc-46db-8176-027d196439cf",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "api_level",
+									"value": "premium",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/subscribe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"subscribe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Stream&Download Quota",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6InVzZXIiLCJzdHJlYW1pbmdfcXVvdGEiOi0xLCJkb3dubG9hZF9xdW90YSI6LTEsInN1YnNjcmlwdGlvbl9wbGFuX2lkIjpudWxsLCJzdWJzY3JpcHRpb25fZXhwaXJlc19hdCI6bnVsbCwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjoiN2UyNjQyODUtMTI5Ni00ZWI2LTliNWQtMjY0MzNmOGE0NmRhIiwiYXBpX2xldmVsIjoicHJlbWl1bSIsImFwaV9xdW90YSI6MCwibGFzdF9sb2dpbiI6bnVsbCwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJjcmVhdGVkX2F0IjoiMjAyNS0wNi0wNFQxNjowNzo1OC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTY6NTQ6MDcuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA5NTY2NH0.g5Dah1tIms_RG-uUaTx_bwV3eTP900-Z0raAoxoOr6Y",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/quota",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"quota"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "admin123",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "admin@email.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "adminpassword",
+									"type": "text"
+								},
+								{
+									"key": "confirm_password",
+									"value": "adminpassword",
+									"type": "text"
+								},
+								{
+									"key": "full_name",
+									"value": "admin user",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "1990-01-01",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "other",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Indonesia",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@email.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "adminpassword",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "testuser@gmail.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "confirm_password",
+									"value": "123456",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "full_name",
+									"value": "Test User",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "2000-01-01",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Indonesia",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "postman-cloud:///1f03c98f-cc8a-49b0-86fe-c929c9bf0fe5"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete/Disable Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6InVzZXIiLCJzdHJlYW1pbmdfcXVvdGEiOjUsImRvd25sb2FkX3F1b3RhIjowLCJzdWJzY3JpcHRpb25fcGxhbl9pZCI6bnVsbCwic3Vic2NyaXB0aW9uX2V4cGlyZXNfYXQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiYXBpX2tleSI6IjgxMzk0NzI1LWQ1MWQtNDExZS05YmI5LTJjMTEzNTY4OGFhZCIsImFwaV9sZXZlbCI6ImZyZWUiLCJhcGlfcXVvdGEiOjAsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTM6NDc6MDguMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDEzOjQ3OjA4LjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkxMDkyOTl9.qHBJxDwtPGpgZLta_4Nq-SyqEH9070PmE1Isql5-q2g",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/account/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"account",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artis",
+			"item": [
+				{
+					"name": "Get All Artis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Artis by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/raisa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"raisa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Artis song",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/raisa/songs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"raisa",
+								"songs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Artis Album",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/tulus/albums",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"tulus",
+								"albums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Artis",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "istts_official",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "Kampus AI",
+									"type": "text"
+								},
+								{
+									"key": "real_name",
+									"value": "Arya",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "aryatukam123@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "jmk488",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "aku pergi",
+									"type": "text"
+								},
+								{
+									"key": "genres",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "tiktok",
+									"type": "text"
+								},
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "postman-cloud:///1f040469-28ba-48c0-b6be-101c758a7eef"
+								},
+								{
+									"key": "dob",
+									"value": "2024-06-04",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Indonesia",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+6287811495673",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow/ Unfollow Artis",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6InVzZXIiLCJzdHJlYW1pbmdfcXVvdGEiOjUsImRvd25sb2FkX3F1b3RhIjowLCJzdWJzY3JpcHRpb25fcGxhbl9pZCI6bnVsbCwic3Vic2NyaXB0aW9uX2V4cGlyZXNfYXQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiYXBpX2tleSI6IjVhMGI5ZTkxLTNhNzktNDVlNC1hMDY5LTQyNGYzY2JmYTk2NCIsImFwaV9sZXZlbCI6ImZyZWUiLCJhcGlfcXVvdGEiOjAsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTI6NTY6NDMuMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDEyOjU2OjQzLjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkwNDE4MDV9.3NaKwR2WtNe0zEs6DDcU6U_PBBJoHOFhut1lQJixyfs",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "istts_official",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "Kampus AI",
+									"type": "text"
+								},
+								{
+									"key": "real_name",
+									"value": "Arya",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "aryatukam123@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "jmk488",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "aku pergi",
+									"type": "text"
+								},
+								{
+									"key": "genres",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "tiktok",
+									"type": "text"
+								},
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "postman-cloud:///1f040469-28ba-48c0-b6be-101c758a7eef"
+								},
+								{
+									"key": "dob",
+									"value": "2024-06-04",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Indonesia",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+6287811495673",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/tulus/follow",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"tulus",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Artis Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoiaXN0dHNfb2ZmaWNpYWwiLCJlbWFpbCI6ImFyeWF0dWthbTEyM0BnbWFpbC5jb20iLCJmdWxsX25hbWUiOiJBcnlhIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS9hcnRpc3RzL3Byb2ZpbGVzL3Byb2ZpbGVfMTc0OTA0MzgyODY5Mi5wbmciLCJkYXRlX29mX2JpcnRoIjoiMjAyNC0wNi0wNCIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6Iis2Mjg3ODExNDk1NjczIiwiYmlvIjoiYWt1IHBlcmdpIiwiZ2VuZGVyIjoibWFsZSIsIlJPTEUiOiJhcnRpc3QiLCJzdHJlYW1pbmdfcXVvdGEiOi0xLCJkb3dubG9hZF9xdW90YSI6LTEsInN1YnNjcmlwdGlvbl9wbGFuX2lkIjoxLCJzdWJzY3JpcHRpb25fZXhwaXJlc19hdCI6bnVsbCwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjoiODJjMjM5YmItOTBkZS00N2UzLWEzYjctM2YzNTY5MzBmMGY2IiwiYXBpX2xldmVsIjoicHJlbWl1bSIsImFwaV9xdW90YSI6LTEsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTM6MzA6MjguMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDEzOjMwOjI4LjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkwNDM5MDZ9.RRDtvBQQ-PEiCn-itIYIj_yAeeM-2ylIL_bb1hx46yg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "bio",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "IG",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/tulus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"tulus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ban Artis",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6ImFkbWluIiwic3RyZWFtaW5nX3F1b3RhIjo1LCJkb3dubG9hZF9xdW90YSI6MCwic3Vic2NyaXB0aW9uX3BsYW5faWQiOm51bGwsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjpudWxsLCJpc19hY3RpdmUiOnRydWUsImFwaV9rZXkiOiIwYzc0NzljMC1lMWQ3LTQwOWItYWY0Ni1mNGUwZTMzYThlMmIiLCJhcGlfbGV2ZWwiOiJmcmVlIiwiYXBpX3F1b3RhIjowLCJsYXN0X2xvZ2luIjpudWxsLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNyZWF0ZWRfYXQiOiIyMDI1LTA2LTA0VDEzOjQyOjA1LjAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNi0wNFQyMDo0NjoyNC4wMDBaIiwiZGVsZXRlZF9hdCI6bnVsbCwiaWF0IjoxNzQ5MDQ0Nzg5fQ.4HM1e4_7pt4VdbRklglDwQqpYMCjW-Fvr4GyigOLqBI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/Kampus AI",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"Kampus AI"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Artis",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6ImFkbWluIiwic3RyZWFtaW5nX3F1b3RhIjo1LCJkb3dubG9hZF9xdW90YSI6MCwic3Vic2NyaXB0aW9uX3BsYW5faWQiOm51bGwsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjpudWxsLCJpc19hY3RpdmUiOnRydWUsImFwaV9rZXkiOiIwYzc0NzljMC1lMWQ3LTQwOWItYWY0Ni1mNGUwZTMzYThlMmIiLCJhcGlfbGV2ZWwiOiJmcmVlIiwiYXBpX3F1b3RhIjowLCJsYXN0X2xvZ2luIjpudWxsLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNyZWF0ZWRfYXQiOiIyMDI1LTA2LTA0VDEzOjQyOjA1LjAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNi0wNFQyMDo0NjoyNC4wMDBaIiwiZGVsZXRlZF9hdCI6bnVsbCwiaWF0IjoxNzQ5MDQ0Nzg5fQ.4HM1e4_7pt4VdbRklglDwQqpYMCjW-Fvr4GyigOLqBI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "status",
+									"value": "verified",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/artists/Kampus AI/verify",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"artists",
+								"Kampus AI",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Playlist",
+			"item": [
+				{
+					"name": "Get All Playlist",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Playlist By Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "Indonesian Pop Hits"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Membuat Playlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA1Mzc0MX0.-PAj9-ID3nsgnTLlVKhlwFuF1H_32t6cxemrXBvwDMo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "EN-SONG",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "MyPlaylist",
+									"type": "text"
+								},
+								{
+									"key": "is_public",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "cover_image",
+									"type": "file",
+									"src": "postman-cloud:///1f03d2f9-d6bf-42a0-a782-7e4a7308abf1"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/playlists",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"playlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Playlist",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA1Mzc0MX0.-PAj9-ID3nsgnTLlVKhlwFuF1H_32t6cxemrXBvwDMo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "EN-SONGS",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "HAHAHA",
+									"type": "text"
+								},
+								{
+									"key": "is_public",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "cover_image",
+									"type": "file",
+									"src": "postman-cloud:///1f03d35d-58b4-42c0-9bdd-91c6f9a482aa"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Playlist",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA1Mzc0MX0.-PAj9-ID3nsgnTLlVKhlwFuF1H_32t6cxemrXBvwDMo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "EN-SONGS",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "HAHAHA",
+									"type": "text"
+								},
+								{
+									"key": "is_public",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "cover_image",
+									"type": "file",
+									"src": "postman-cloud:///1f03d35d-58b4-42c0-9bdd-91c6f9a482aa"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like/unlike playlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA1Mzc0MX0.-PAj9-ID3nsgnTLlVKhlwFuF1H_32t6cxemrXBvwDMo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:id/like",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add song to playlist",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "song_name",
+									"value": "Dut dan dut",
+									"type": "text"
+								},
+								{
+									"key": "position",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:id/songs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":id",
+								"songs"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove song from playlist",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/:id/songs/:songId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								":id",
+								"songs",
+								":songId"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8"
+								},
+								{
+									"key": "songId",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Iklan",
+			"item": [
+				{
+					"name": "createAd",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUsInVzZXJuYW1lIjoiYWRtaW4xMjMiLCJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsImZ1bGxfbmFtZSI6ImFkbWluIHVzZXIiLCJwcm9maWxlX3BpY3R1cmUiOm51bGwsImRhdGVfb2ZfYmlydGgiOiIxOTkwLTAxLTAxIiwiY291bnRyeSI6IkluZG9uZXNpYSIsInBob25lIjpudWxsLCJiaW8iOm51bGwsImdlbmRlciI6Im90aGVyIiwiUk9MRSI6ImFkbWluIiwic3RyZWFtaW5nX3F1b3RhIjotMSwiZG93bmxvYWRfcXVvdGEiOi0xLCJzdWJzY3JpcHRpb25fcGxhbl9pZCI6bnVsbCwic3Vic2NyaXB0aW9uX2V4cGlyZXNfYXQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiYXBpX2tleSI6ImRhNWY5ZTRhLTMwNzAtNDgxYy1hODY1LTZmZWQ3M2RiMzEyYyIsImFwaV9sZXZlbCI6InByZW1pdW0iLCJhcGlfcXVvdGEiOjAsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTY6NTg6MDEuMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDE2OjU4OjAxLjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkwOTY5OTd9.dm6TcKGdbFlZSfIRUSmLhMZO15fAabdUEW_TWLXj8vA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Rick Roll1",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Rick Astley",
+									"type": "text"
+								},
+								{
+									"key": "target_url",
+									"value": "https://youtu.be/dQw4w9WgXcQ?si=i5DdO7XKJ_N760R2",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "3.600",
+									"type": "text"
+								},
+								{
+									"key": "budget",
+									"value": "1000000",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "2025-06-01",
+									"type": "text"
+								},
+								{
+									"key": "end_date",
+									"value": "2025-06-30",
+									"type": "text"
+								},
+								{
+									"key": "streaming_quota",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "video",
+									"type": "file",
+									"src": "/C:/Users/Rexso/Videos/Rick Astley - Never Gonna Give You Up (Official Music Video).mp4"
+								},
+								{
+									"key": "audio",
+									"type": "file",
+									"src": "/C:/Users/Rexso/Music/Rick Astley - Never Gonna Give You Up (Official Music Video).mp3"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/ads",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"ads"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Watch ads",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/ads/watch",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"ads",
+								"watch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete ad",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUsInVzZXJuYW1lIjoiYWRtaW4xMjMiLCJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsImZ1bGxfbmFtZSI6ImFkbWluIHVzZXIiLCJwcm9maWxlX3BpY3R1cmUiOm51bGwsImRhdGVfb2ZfYmlydGgiOiIxOTkwLTAxLTAxIiwiY291bnRyeSI6IkluZG9uZXNpYSIsInBob25lIjpudWxsLCJiaW8iOm51bGwsImdlbmRlciI6Im90aGVyIiwiUk9MRSI6ImFkbWluIiwic3RyZWFtaW5nX3F1b3RhIjotMSwiZG93bmxvYWRfcXVvdGEiOi0xLCJzdWJzY3JpcHRpb25fcGxhbl9pZCI6bnVsbCwic3Vic2NyaXB0aW9uX2V4cGlyZXNfYXQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiYXBpX2tleSI6ImRhNWY5ZTRhLTMwNzAtNDgxYy1hODY1LTZmZWQ3M2RiMzEyYyIsImFwaV9sZXZlbCI6InByZW1pdW0iLCJhcGlfcXVvdGEiOjAsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTY6NTg6MDEuMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDE2OjU4OjAxLjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkwOTY5OTd9.dm6TcKGdbFlZSfIRUSmLhMZO15fAabdUEW_TWLXj8vA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/ads/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"ads",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Song",
+			"item": [
+				{
+					"name": "Get All Song",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								""
+							],
+							"query": [
+								{
+									"key": "genre",
+									"value": "pop",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": " ",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Song By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id"
+							],
+							"query": [
+								{
+									"key": "market",
+									"value": "ES",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Song",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Dut dan Dut",
+									"type": "text"
+								},
+								{
+									"key": "album_id",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "Anjay",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "58",
+									"type": "text"
+								},
+								{
+									"key": "lyrics",
+									"value": "dut dut dut",
+									"type": "text"
+								},
+								{
+									"key": "explicit_content",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "2025-06-03 10:04:31",
+									"type": "text"
+								},
+								{
+									"key": "audio_file",
+									"type": "file",
+									"src": "postman-cloud:///1f04061e-11c0-4280-996b-206d71930897"
+								},
+								{
+									"key": "cover_image",
+									"type": "file",
+									"src": "postman-cloud:///1f03c98f-cc8a-49b0-86fe-c929c9bf0fe5"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Song",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Dut dan Ding",
+									"type": "text"
+								},
+								{
+									"key": "album_id",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "Waduhai",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "59",
+									"type": "text"
+								},
+								{
+									"key": "lyrics",
+									"value": "dut ding dut ding dut",
+									"type": "text"
+								},
+								{
+									"key": "explicit_content",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Song",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like Song",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id/like",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Play Song",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id/play",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id",
+								"play"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Song",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0ODk0NDI0M30.LnU8Co5dk11QZs5l4bTvYsNrfRpeWJ4Y4ho10ZW44Ck",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/songs/:id/download",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"songs",
+								":id",
+								"download"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "12"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Album",
+			"item": [
+				{
+					"name": "Get All albums",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Album by Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "bio",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "IG",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Album Songs",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "bio",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "IG",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id/songs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id",
+								"songs"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like Album",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoidGVzdHVzZXJzIiwiZW1haWwiOiJ0ZXN0dXNlcnNAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoiVGVzdCBVc2VyIiwicHJvZmlsZV9waWN0dXJlIjoic3RvcmFnZS90ZXN0dXNlcnMvcHJvZmlsZS5qcGciLCJkYXRlX29mX2JpcnRoIjoiMjAwMC0wMS0wMSIsImNvdW50cnkiOiJJbmRvbmVzaWEiLCJwaG9uZSI6bnVsbCwiYmlvIjpudWxsLCJnZW5kZXIiOiJtYWxlIiwiUk9MRSI6InVzZXIiLCJzdHJlYW1pbmdfcXVvdGEiOjUsImRvd25sb2FkX3F1b3RhIjowLCJzdWJzY3JpcHRpb25fcGxhbl9pZCI6bnVsbCwic3Vic2NyaXB0aW9uX2V4cGlyZXNfYXQiOm51bGwsImlzX2FjdGl2ZSI6dHJ1ZSwiYXBpX2tleSI6Ijk0OTA2MTIyLTY5YjYtNGE3MC1iMmQ1LTRkZTQxNGI2ZjgzMCIsImFwaV9sZXZlbCI6ImZyZWUiLCJhcGlfcXVvdGEiOjAsImxhc3RfbG9naW4iOm51bGwsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY3JlYXRlZF9hdCI6IjIwMjUtMDYtMDRUMTQ6MzA6MjguMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA2LTA0VDE0OjMwOjI4LjAwMFoiLCJkZWxldGVkX2F0IjpudWxsLCJpYXQiOjE3NDkwNDc0MzZ9.ctFJG_DHo7ITyI_751jRn5d4GZsXOg8yJkXfHNdzHWQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "bio",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "social_links",
+									"value": "IG",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id/like",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add Album",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Anjas",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Album",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Anjas",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Album",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Anjas",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add song to album",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Anjas",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id/songs/:songId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id",
+								"songs",
+								":songId"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								},
+								{
+									"key": "songId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Song from album",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Saya jawa",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Anjas",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "genre",
+									"value": "RGB, POP",
+									"type": "text"
+								},
+								{
+									"key": "release_date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/albums/:id/songs/:songId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"albums",
+								":id",
+								"songs",
+								":songId"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								},
+								{
+									"key": "songId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SpotifyAPI (Axios)",
+			"item": [
+				{
+					"name": "Songs",
+					"item": [
+						{
+							"name": "Search Song",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/songs/search/spotify?query=like",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"songs",
+										"search",
+										"spotify"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "like"
+										},
+										{
+											"key": "market",
+											"value": "ES",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "20",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get Track",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/songs/spotify/:trackId",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"songs",
+										"spotify",
+										":trackId"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ES",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trackId",
+											"value": "0fK7ie6XwGxQTIkpFoWkd1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get Banyak Track",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/v1/songs/spotify/tracks/:trackId",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"songs",
+										"spotify",
+										"tracks",
+										":trackId"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ES",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trackId",
+											"value": "0fK7ie6XwGxQTIkpFoWkd1,7ouMYWpwJ422jRcDASZB7P,4VqPOruhp5EdPBeR92t6lQ,2takcwOaAZWiXQijPHIx7B"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Albums",
+					"item": [
+						{
+							"name": "Searach Album",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/albums/search/spotify?query=like",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"albums",
+										"search",
+										"spotify"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "like"
+										},
+										{
+											"key": "market",
+											"value": "ES",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "20",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get Album",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyYWlzYV9vZmZpY2lhbCIsImVtYWlsIjoicmFpc2FAdHJhc2h3YXZlLmlkIiwiZnVsbF9uYW1lIjoiUmFpc2EgQW5kcmlhbmEiLCJwcm9maWxlX3BpY3R1cmUiOiJodHRwczovL2Nkbi50cmFzaHdhdmUuaWQvcHJvZmlsZXMvcmFpc2EuanBnIiwiZGF0ZV9vZl9iaXJ0aCI6IjE5OTAtMDYtMDYiLCJjb3VudHJ5IjoiSW5kb25lc2lhIiwicGhvbmUiOiIrNjI4MTIzNDU2Nzg5IiwiYmlvIjoiSW5kb25lc2lhbiBSJkIgU2luZ2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwiUk9MRSI6ImFydGlzdCIsInN0cmVhbWluZ19xdW90YSI6LTEsImRvd25sb2FkX3F1b3RhIjotMSwic3Vic2NyaXB0aW9uX3BsYW5faWQiOjMsInN1YnNjcmlwdGlvbl9leHBpcmVzX2F0IjoiMjAyNS0xMi0zMVQyMzo1OTo1OS4wMDBaIiwiaXNfYWN0aXZlIjp0cnVlLCJhcGlfa2V5IjpudWxsLCJhcGlfbGV2ZWwiOiJwcmVtaXVtIiwiYXBpX3F1b3RhIjotMSwibGFzdF9sb2dpbiI6IjIwMjUtMDYtMDJUMjA6MTU6MDAuMDAwWiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjcmVhdGVkX2F0IjoiMjAyNC0wMi0xNVQxMDozMDowMC4wMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMTVUMTA6MzA6MDAuMDAwWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc0OTA0ODQ4Mn0.UJjxDFKXBDXgBTtE01kI7N2GMZJYnim5-P2SAwcf0q0",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/albums/spotify/:albumId?market=ES",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"albums",
+										"spotify",
+										":albumId"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ES"
+										}
+									],
+									"variable": [
+										{
+											"key": "albumId",
+											"value": "2PxwTnSJW1mXpnb1HO2Tsf"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get Banyak Album",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/albums/spotify/albums/:albumIds",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"albums",
+										"spotify",
+										"albums",
+										":albumIds"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ES",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "albumIds",
+											"value": "382ObEPsp2rxGrnsizN5TX,1A2GTWGtFfWp7KSQTwWOyo,2noRn2Aes5aoNVsU6iWThc"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Playlist",
+					"item": [
+						{
+							"name": "Search playlists on Spotify",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/playlists/search/spotify?query=Lagu&market=ID",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"playlists",
+										"search",
+										"spotify"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Lagu"
+										},
+										{
+											"key": "market",
+											"value": "ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Spotify playlist details",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/playlists/spotify/:playlistId?market=ID&fields=tracks.items(track(name,album(name),artists(name)))&additional_types",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"playlists",
+										"spotify",
+										":playlistId"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ID"
+										},
+										{
+											"key": "fields",
+											"value": "tracks.items(track(name,album(name),artists(name)))"
+										},
+										{
+											"key": "additional_types",
+											"value": null
+										}
+									],
+									"variable": [
+										{
+											"key": "playlistId",
+											"value": "3cEYpjA9oz9GiPac4AsH4n"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Search multiple content types on Spotify",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/playlists/search/spotify/multiple?query=En Song&types=album&limit=20&offset=0&market=ID",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"search",
+								"spotify",
+								"multiple"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "En Song"
+								},
+								{
+									"key": "types",
+									"value": "album"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "market",
+									"value": "ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Artis by Axios",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
